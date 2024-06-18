@@ -1,5 +1,20 @@
 import { z } from "zod";
-import { DiaSemana } from "../services/api/dtos/horario-restaurante";
+import { DiaSemana } from "../../services/api/dtos/horario-restaurante";
+
+export const steps = [
+  {
+    label: "Informações de Exibição",
+  },
+  {
+    label: "Endereço",
+  },
+  {
+    label: "Horários",
+  },
+  {
+    label: "Cupons",
+  },
+];
 
 export const WeekDays = [
   {
