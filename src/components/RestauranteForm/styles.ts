@@ -4,23 +4,32 @@ export const Container = styled.div`
   padding: 80px;
 
   width: 100%;
+  max-height: 100%;
+
   display: flex;
   flex-direction: column;
+  overflow: auto;
 `;
 
 export const Wrapper = styled.div`
   flex: 1;
   width: 100%;
   max-width: ${({ theme }) => theme.breakpoints.xl};
+
+  display: flex;
+  flex-direction: column;
 `;
 
 export const Tabs = styled.div`
+  margin-bottom: 72px;
+
   width: 100%;
   display: flex;
 `;
 
 export const TabLabel = styled.p`
   font-size: 22px;
+  text-align: start;
 `;
 
 export const Tab = styled.button<{ active: boolean }>`
@@ -32,6 +41,7 @@ export const Tab = styled.button<{ active: boolean }>`
 
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   gap: 10px;
 
   cursor: pointer;
@@ -44,4 +54,18 @@ export const Tab = styled.button<{ active: boolean }>`
   &:hover {
     filter: brightness(0.75);
   }
+`;
+
+export const Step = styled.div`
+  flex: 1;
+
+  margin-bottom: 32px;
+`;
+
+export const ButtonsWrapper = styled.div`
+  margin-top: 14px;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
 `;

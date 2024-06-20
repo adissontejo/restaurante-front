@@ -9,11 +9,11 @@ export const GlobalStyles = createGlobalStyle`
     font-family: 'Mulish', sans-serif;
     font-weight: 400;
     font-size: 16px;
-    color: white;
   }
 
   button {
     background: none;
     border: none;
+    cursor: pointer;
   }
 `;

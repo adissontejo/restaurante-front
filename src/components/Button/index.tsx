@@ -1,13 +1,18 @@
+import { HTMLAttributes } from "react";
 import { Container, Label } from "./styles";
 
-export interface ButtonProps {
-  onClick?: () => void;
+export interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
   children?: string;
+  variant?: "light" | "dark";
 }
 
-export const Button = ({ onClick, children }: ButtonProps) => {
+export const Button = ({
+  children,
+  variant = "light",
+  ...rest
+}: ButtonProps) => {
   return (
-    <Container onClick={onClick}>
+    <Container {...rest} variant={variant}>
       <Label>{children}</Label>
     </Container>
   );

@@ -27,15 +27,18 @@ export const Overlay = styled.div`
 `;
 
 export const Title = styled.h1`
+  color: white;
   font-size: 60px;
 `;
 
 export const Strong = styled.strong`
+  color: white;
   font-size: 60px;
   font-weight: 800;
 `;
 
 export const Description = styled.p`
+  color: white;
   font-size: 25px;
   text-align: center;
   max-width: ${({ theme }) => theme.breakpoints.md};

@@ -3,6 +3,7 @@ import { createTheme } from "@mui/material";
 export const theme = {
   colors: {
     brown: {
+      50: "#F0EBE7",
       100: "#D1C1B4",
       200: "#BAA38F",
       300: "#9B795C",
@@ -15,7 +16,16 @@ export const theme = {
       500: "#FFFFFF",
     },
     black: {
+      50: "#e8e8e8",
+      400: "#484848",
+      500: "#1A1A1A",
       600: "#181818",
+    },
+    text: {
+      secondary: "rgba(0, 0, 0, 0.6)",
+    },
+    beige: {
+      100: "#FBF2EA",
     },
   },
   fonts: {
@@ -40,4 +50,54 @@ export const muiTheme = createTheme({
     },
   },
   spacing: 4,
+  components: {
+    MuiPopover: {
+      styleOverrides: {
+        root: {
+          "& .MuiPaper-root": {
+            background: "transparent",
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          boxShadow: "none",
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          background: "white",
+          "& .MuiFormHelperText-root.Mui-error": {
+            position: "absolute",
+            top: "100%",
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          "&, .MuiInputLabel-asterisk": {
+            color: theme.colors.text.secondary,
+          },
+          "&.Mui-focused, &.Mui-focused .MuiInputLabel-asterisk": {
+            color: theme.colors.brown[500],
+          },
+        },
+      },
+    },
+    MuiCircularProgress: {
+      styleOverrides: {
+        root: {
+          "& .MuiCircularProgress-circle": {
+            stroke: theme.colors.text.secondary,
+          },
+        },
+      },
+    },
+  },
 });
