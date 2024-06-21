@@ -40,6 +40,7 @@ export const theme = {
     green: {
         100: "#B8D2C3",
         500: "#196F3D",
+    },
     text: {
       secondary: "rgba(0, 0, 0, 0.6)",
     },
@@ -54,7 +55,7 @@ export const theme = {
     xl: "1280px",
     "2xl": "1536px",
   },
-} as const;
+} as const
 
 export const muiTheme = createTheme({
   typography: {
