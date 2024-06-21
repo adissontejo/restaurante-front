@@ -1,4 +1,4 @@
-import { Container, StepConnector, StepWrapper, Stepper } from "./styles";
+import { Body, Container, StepConnector, StepWrapper, Stepper } from "./styles";
 import { steps } from "./constants";
 import { Fragment } from "react/jsx-runtime";
 import { useState } from "react";
@@ -22,7 +22,9 @@ export const CreateRestaurante = () => {
           ))}
         </Stepper>
       </LeftPanel>
-      <RestauranteForm />
+      <Body>
+        <RestauranteForm />
+      </Body>
     </Container>
   );
 };

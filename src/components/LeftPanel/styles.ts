@@ -2,11 +2,12 @@ import styled from "styled-components";
 import backgroundImg from "../../assets/background.png";
 
 export const Container = styled.aside`
-  height: 100%;
+  height: 100vh;
   background: center no-repeat url(${backgroundImg});
   border-radius: 0 30px 30px 0;
   box-shadow: 8px 4px 50px 0 rgba(0, 0, 0, 0.25);
   overflow: hidden;
+  position: fixed;
 `;
 
 export const Overlay = styled.div`

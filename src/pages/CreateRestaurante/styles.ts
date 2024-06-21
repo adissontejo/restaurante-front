@@ -36,3 +36,12 @@ export const StepConnector = styled.div`
   width: 4px;
   background: ${({ theme }) => theme.colors.brown[200]};
 `;
+
+export const Body = styled.div`
+    padding: 75px 73px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    margin-left: 200px;
+`;
