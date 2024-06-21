@@ -18,8 +18,6 @@ export const CouponsStep = ({ form }: CouponsStepProps) => {
 
   const enabled = watch("enabled");
 
-  console.log(form?.getValues());
-
   return (
     <Form>
       <GridItem>

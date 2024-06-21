@@ -1,7 +1,6 @@
 import { UseFormReturn } from "react-hook-form";
 import { ControlledFormField, Form } from "../../Form";
 import { CircularProgress, InputAdornment } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { restauranteByDominioQuery } from "../../../services/api/restaurantes";
 import { GridItem } from "../../Grid";
 import { ControlledUploadImage } from "../../UploadImage";
@@ -22,7 +21,7 @@ export const ExhibitionStep = ({ form }: ExhibitionStepProps) => {
 
   const dominio = watch("dominio");
 
-  const { isLoading } = useQuery(restauranteByDominioQuery(dominio));
+  const { isLoading } = restauranteByDominioQuery.params(dominio).use();
 
   return (
     <Form>

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { DiaSemana } from "../../services/api/dtos/horario-restaurante";
-import { queryClient } from "../../services/queries/client";
 import { restauranteByDominioQuery } from "../../services/api/restaurantes";
 import { cepQuery } from "../../services/viacep";
 
@@ -69,9 +68,9 @@ export const exhibitionFormSchema = z
   })
   .superRefine(async (data, ctx) => {
     if (data.dominio.length >= 3) {
-      const restaurante = await queryClient.fetchQuery(
-        restauranteByDominioQuery(data.dominio)
-      );
+      const restaurante = await restauranteByDominioQuery
+        .params(data.dominio)
+        .fetch();
 
       if (restaurante) {
         ctx.addIssue({
@@ -102,7 +101,7 @@ export const addressFormSchema = z
   })
   .superRefine(async (data, ctx) => {
     if (data.cep.replace(/\D/g, "").length === 8) {
-      const result = await queryClient.fetchQuery(cepQuery(data.cep));
+      const result = await cepQuery.params(data.cep).fetch();
       if (!result) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

@@ -18,9 +18,11 @@ export const ModalCard = ({
     <Container {...rest}>
       <Header>
         <Title>{title}</Title>
-        <IconButton onClick={onClose}>
-          <Close />
-        </IconButton>
+        {onClose && (
+          <IconButton onClick={onClose}>
+            <Close />
+          </IconButton>
+        )}
       </Header>
       {children}
     </Container>

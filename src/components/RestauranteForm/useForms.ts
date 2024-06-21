@@ -13,8 +13,8 @@ import { toast } from "react-toastify";
 import { SchedulesFormData } from "./SchedulesStep";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Horario } from "./SchedulesStep/SchedulePicker/ModalForm";
-import { useCreateRestauranteMutation } from "../../services/api/restaurantes";
 import { format } from "date-fns";
+import { createRestauranteMutation } from "../../services/api/restaurantes";
 
 export type Section = (typeof sections)[number]["key"];
 
@@ -29,7 +29,7 @@ export const useForms = ({
   onBack,
   onForward,
 }: UseFormsProps) => {
-  const createRestaurante = useCreateRestauranteMutation();
+  const createRestaurante = createRestauranteMutation.use();
 
   const exhibitionForm = useForm<ExhibitionFormData>({
     resolver: zodResolver(exhibitionFormSchema),

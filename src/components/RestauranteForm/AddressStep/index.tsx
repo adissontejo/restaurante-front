@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { ControlledFormField, Form } from "../../Form";
 import { UseFormReturn } from "react-hook-form";
 import { ViacepCepResponseDTO } from "../../../services/viacep/dtos/viacep-cep-response";
-import { useQuery } from "@tanstack/react-query";
 import { cepQuery } from "../../../services/viacep";
 
 export interface AddressFormData {
@@ -25,7 +24,7 @@ export const AddressStep = ({ form }: AddressStepProps) => {
 
   const cep = watch("cep");
 
-  const { data, isLoading } = useQuery(cepQuery(cep));
+  const { data, isLoading } = cepQuery.params(cep).use();
 
   useEffect(() => {
     if (cep?.length === 9 && data) {

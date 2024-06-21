@@ -8,7 +8,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { GlobalStyles } from "./styles/global";
 import { queryClient } from "./services/queries/client";
 import { ToastContainer } from "react-toastify";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthProvider } from "./contexts/Auth";
 
 export const App = () => {
   return (
@@ -16,20 +18,26 @@ export const App = () => {
       <MuiThemeProvider theme={muiTheme}>
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <GlobalStyles />
-            <Routes />
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
+            <GoogleOAuthProvider
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+            >
+              <AuthProvider>
+                <GlobalStyles />
+                <Routes />
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="light"
+                />
+              </AuthProvider>
+            </GoogleOAuthProvider>
           </LocalizationProvider>
         </ThemeProvider>
       </MuiThemeProvider>

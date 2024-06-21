@@ -5,12 +5,14 @@ import { useState } from "react";
 import { RestauranteForm } from "../../components/RestauranteForm";
 import { LeftPanel } from "../../components/LeftPanel";
 import Complete from "../../assets/complete.svg?react";
+import { LoginModal } from "../../components/LoginModal";
 
 export const CreateRestaurante = () => {
   const [activeStep, setActiveStep] = useState(0);
 
   return (
     <Container>
+      <LoginModal />
       <LeftPanel>
         <Stepper>
           {steps.map(({ icon: Icon }, index) => (
