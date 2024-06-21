@@ -1,4 +1,4 @@
-import { Container, StepConnector, StepWrapper, Stepper } from "./styles";
+import { Body, Container, StepConnector, StepWrapper, Stepper } from "./styles";
 import { steps } from "./constants";
 import { Fragment } from "react/jsx-runtime";
 import { useState } from "react";
@@ -28,11 +28,14 @@ export const CreateRestaurante = () => {
           ))}
         </Stepper>
       </LeftPanel>
-      <RestauranteForm
-        currentSection={steps[activeStep].key}
-        onBack={() => setActiveStep((prev) => prev - 1)}
-        onForward={() => setActiveStep((prev) => prev + 1)}
-      />
+      <Body>
+        <RestauranteForm
+          currentSection={steps[activeStep].key}
+          onBack={() => setActiveStep((prev) => prev - 1)}
+          onForward={() => setActiveStep((prev) => prev + 1)}
+        />
+        
+      </Body>
     </Container>
   );
 };
