@@ -20,14 +20,26 @@ export const Stepper = styled.div`
   gap: 8px;
 `;
 
-export const StepWrapper = styled.div<{ active: boolean }>`
+export const StepWrapper = styled.div<{ active: boolean; complete: boolean }>`
   padding: 24px 32px;
 
-  background: ${({ active }) => (active ? "white" : "transparent")};
+  background: ${({ active, theme, complete }) => {
+    if (complete) {
+      return theme.colors.brown[900];
+    }
+
+    return active ? "white" : "transparent";
+  }};
   border-radius: 50px;
 
   path {
-    fill: ${({ theme, active }) => theme.colors.brown[active ? 900 : 200]};
+    fill: ${({ theme, active, complete }) => {
+      if (complete) {
+        return "white";
+      }
+
+      return theme.colors.brown[active ? 900 : 200];
+    }};
   }
 `;
 
