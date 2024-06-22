@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { DiaSemana } from "../../services/api/dtos/horario-restaurante";
 import { restauranteByDominioQuery } from "../../services/api/restaurantes";
 import { cepQuery } from "../../services/viacep";
+import { DiaSemana } from "../../services/api/dtos/restaurante";
 
 export const sections = [
   {

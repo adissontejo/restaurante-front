@@ -1,20 +1,59 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { CreateRestaurante } from "./pages/CreateRestaurante";
-import { Cliente } from "./pages/Cliente";
+import { RestauranteHome } from "./pages/RestauranteHome";
+import { AppContainer } from "./components/AppContainer";
+import { RestauranteItens } from "./pages/RestauranteItens";
+import { RestauranteCarrinho } from "./pages/RestauranteCarrinho";
+import { RestauranteContaMes } from "./pages/RestauranteContaMes";
+import { RestauranteContaCliente } from "./pages/RestauranteContaCliente";
+import { App } from "./App";
+import { RestauranteProvider } from "./contexts/Restaurante";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/criar-restaurante",
-    element: <CreateRestaurante />,
-  },
-  {
-    path: "/cliente",
-    element: <Cliente />,
+    element: <App />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/criar-restaurante",
+        element: <CreateRestaurante />,
+      },
+      {
+        path: "/restaurante/:dominio",
+        element: (
+          <RestauranteProvider>
+            <AppContainer />
+          </RestauranteProvider>
+        ),
+        children: [
+          {
+            index: true,
+            element: <RestauranteHome />,
+          },
+          {
+            path: "cardapio",
+            element: <RestauranteItens />,
+          },
+          {
+            path: "carrinho",
+            element: <RestauranteCarrinho />,
+          },
+          {
+            path: "historico",
+            element: <RestauranteContaMes />,
+          },
+          {
+            path: "conta",
+            element: <RestauranteContaCliente />,
+          },
+        ],
+      },
+    ],
   },
 ]);
 

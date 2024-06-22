@@ -13,14 +13,14 @@ export const theme = {
       900: "#2D1705",
     },
     beige: {
-        100: "#FBF2EA",
-        200: "#F9ECE0",
-        300: "#F6E3D1",
-        400: "#F4DDC9",
-        500: "#F1D5BB",
-        600: "#DBC2AA",
-        700: "#AB9785",
-        900: "#65594F",
+      100: "#FBF2EA",
+      200: "#F9ECE0",
+      300: "#F6E3D1",
+      400: "#F4DDC9",
+      500: "#F1D5BB",
+      600: "#DBC2AA",
+      700: "#AB9785",
+      900: "#65594F",
     },
     white: {
       500: "#FFFFFF",
@@ -35,11 +35,11 @@ export const theme = {
       600: "#181818",
     },
     red: {
-        400: "#BA5B51",
+      400: "#BA5B51",
     },
     green: {
-        100: "#B8D2C3",
-        500: "#196F3D",
+      100: "#B8D2C3",
+      500: "#196F3D",
     },
     text: {
       secondary: "rgba(0, 0, 0, 0.6)",
@@ -55,7 +55,7 @@ export const theme = {
     xl: "1280px",
     "2xl": "1536px",
   },
-} as const
+} as const;
 
 export const muiTheme = createTheme({
   typography: {
@@ -68,22 +68,6 @@ export const muiTheme = createTheme({
   },
   spacing: 4,
   components: {
-    MuiPopover: {
-      styleOverrides: {
-        root: {
-          "& .MuiPaper-root": {
-            background: "transparent",
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          boxShadow: "none",
-        },
-      },
-    },
     MuiTextField: {
       styleOverrides: {
         root: {

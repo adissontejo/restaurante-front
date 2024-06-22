@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Horario } from "./SchedulesStep/SchedulePicker/ModalForm";
 import { format } from "date-fns";
 import { createRestauranteMutation } from "../../services/api/restaurantes";
+import { useNavigate } from "react-router-dom";
 
 export type Section = (typeof sections)[number]["key"];
 
@@ -29,6 +30,8 @@ export const useForms = ({
   onBack,
   onForward,
 }: UseFormsProps) => {
+  const navigate = useNavigate();
+
   const createRestaurante = createRestauranteMutation.use();
 
   const exhibitionForm = useForm<ExhibitionFormData>({
@@ -120,6 +123,7 @@ export const useForms = ({
         {
           nome: exhibitionData.nome,
           dominio: exhibitionData.dominio,
+          descricao: exhibitionData.descricao,
           logo: exhibitionData.logo,
           cep: addressData.cep.replace(/\D/g, ""),
           complemento: addressData.complemento,
@@ -130,6 +134,9 @@ export const useForms = ({
           valorFidelidade: couponsData.valorFidelidade,
         },
         {
+          onSuccess(data) {
+            navigate(`/restaurante/${data.dominio}`);
+          },
           onError() {
             toast.error("Erro ao criar restaurante");
           },

@@ -60,6 +60,10 @@ export class Query<A extends any[], T> {
   fetch() {
     return queryClient.fetchQuery(this.query);
   }
+
+  invalidate() {
+    return queryClient.invalidateQueries(this.query);
+  }
 }
 
 export class Mutation<A, T> {

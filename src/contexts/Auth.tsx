@@ -11,13 +11,17 @@ export interface AuthContextData {
 export const AuthContext = createContext<AuthContextData | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { data: usuario, refetch } = usuarioLogadoQuery.use();
+  const {
+    data: usuario,
+    isLoading,
+    refetch: refetchUsuarioLogado,
+  } = usuarioLogadoQuery.use();
 
   const login = loginMutation
     .options({
       onSuccess(data) {
         localStorage.setItem("token", data.accessToken);
-        refetch();
+        refetchUsuarioLogado();
       },
     })
     .use();
@@ -26,6 +30,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     flow: "auth-code",
     onSuccess: ({ code }) => login.mutate(code),
   });
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider value={{ usuario, login: googleLogin }}>
