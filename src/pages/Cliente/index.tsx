@@ -1,7 +1,7 @@
 import { Container, Body } from "./styles";
 import { itemsMenu } from "./contants";
 import { LateralMenu } from "../../components/LateralMenu";
-import { Usuario, restaurante, usuarios, ItemPedido, itemPedidos } from "../../data";
+import { Usuario, restaurantes, usuarios, ItemPedido, itemPedidos } from "../../data";
 import { useEffect, useState } from "react";
 import { RestauranteInfo } from "../../components/ClienteComponents/RestauranteInfo";
 import { RestauranteItens } from "../../components/ClienteComponents/RestauranteItens";
@@ -14,6 +14,7 @@ export const Cliente = () => {
 
     const [activeItem, setActiveItem] = useState(0);
     const [itensCarrinho, setItensCarrinho] = useState(Array<ItemPedido>);
+    const restaurante = restaurantes[0];
 
     const handleClickItemMenu = (index : number) => {
         setActiveItem(index);

@@ -26,7 +26,7 @@ export const Home = () => {
           <Button onClick={() => navigate("/criar-restaurante")}>
             Crie seu restaurante!
           </Button>
-          <Button onClick={() => navigate("/cliente")}>Ver restaurantes</Button>
+          <Button onClick={() => navigate("/restaurantes")}>Ver restaurantes</Button>
         </ButtonsWrapper>
       </Overlay>
     </Container>
