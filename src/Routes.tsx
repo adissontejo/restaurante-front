@@ -12,6 +12,7 @@ import { RestauranteProvider } from "./contexts/Restaurante";
 import { SocketProvider } from "./contexts/Socket";
 import { RestauranteContaPedidos } from "./pages/RestauranteContaPedidos";
 import { RestaurantePedidos } from "./pages/RestaurantePedidos";
+import { HomeRestaurants } from "./pages/HomeRestaurants";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/restaurantes",
+        element: <HomeRestaurants />,
       },
       {
         path: "/criar-restaurante",

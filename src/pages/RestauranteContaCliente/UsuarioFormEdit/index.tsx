@@ -11,6 +11,7 @@ import { ControlledUploadImage } from "../../../components/UploadImage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema } from "./constants";
 import { updateUsuarioMutation } from "../../../services/api/usuarios";
+import { toast } from "react-toastify";
 
 interface FormData {
   nome: string;
@@ -39,13 +40,20 @@ export const UsuarioFormEdit = () => {
       return;
     }
 
-    updateUsuario.mutate({
-      id: usuario.id,
-      usuario: {
-        ...data,
-        fotoPerfil: data.fotoPerfil || undefined,
+    updateUsuario.mutate(
+      {
+        id: usuario.id,
+        usuario: {
+          ...data,
+          fotoPerfil: data.fotoPerfil || undefined,
+        },
       },
-    });
+      {
+        onSuccess() {
+          toast.success("Dados atualizados com sucesso!");
+        },
+      }
+    );
   };
 
   const handleCancel = () => {

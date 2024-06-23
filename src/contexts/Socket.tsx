@@ -21,11 +21,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<Socket>();
 
   useEffect(() => {
-    const unloggedIds: number[] = JSON.parse(
-      localStorage.getItem("unloggedIds") || "[]"
-    );
-
-    setSocket(createPedidosSocket(restaurante.id, "cliente", unloggedIds));
+    setSocket(createPedidosSocket(restaurante.id, "cliente"));
   }, [restaurante, usuario]);
 
   socket?.once("connection_response", (data) => {

@@ -1,3 +1,4 @@
+import { serialize } from "object-to-formdata";
 import { createMutation, createQuery } from "../queries/client";
 import { api } from "./base";
 import { UpdateUsuarioDTO } from "./dtos/update-usuario.dto";
@@ -12,13 +13,18 @@ export const usuarioLogadoQuery = createQuery(() => ({
 })).params();
 
 export const updateUsuarioMutation = createMutation({
-  mutationFn: ({ id, usuario }: { id: number; usuario: UpdateUsuarioDTO }) =>
-    api
-      .put<UsuarioResponseDTO>(`/usuarios/${id}`, usuario)
+  mutationFn: ({ id, usuario }: { id: number; usuario: UpdateUsuarioDTO }) => {
+    const formData = serialize(usuario, {
+      indices: true,
+    });
+
+    return api
+      .put<UsuarioResponseDTO>(`/usuarios/${id}`, formData)
       .then((response) => response.data)
       .then((data) => {
         usuarioLogadoQuery.invalidate();
 
         return data;
-      }),
+      });
+  },
 });

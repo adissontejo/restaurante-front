@@ -4,6 +4,15 @@ import { createMutation, createQuery } from "../queries/client";
 import { RestauranteResponseDTO } from "./dtos/restaurante-response.dto";
 import { CreateRestauranteDTO } from "./dtos/create-restaurante.dto";
 
+export const restaurantesQuery = createQuery({
+  staleTime: 10 * 60 * 1000,
+  queryKey: ["restaurantes"],
+  queryFn: () =>
+    api
+      .get<RestauranteResponseDTO[]>("/restaurantes")
+      .then((response) => response.data),
+});
+
 export const restauranteByDominioQuery = createQuery((dominio?: string) => ({
   staleTime: 10 * 60 * 1000,
   queryKey: ["restaurante", "by-dominio", dominio],

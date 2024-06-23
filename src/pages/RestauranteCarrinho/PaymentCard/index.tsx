@@ -15,6 +15,7 @@ import { theme } from "../../../styles/theme";
 import { useSocket } from "../../../hooks/useSocket";
 import { useRestaurante } from "../../../hooks/useRestaurante";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface PaymentCardProps {}
 
@@ -57,6 +58,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
         quantidade: item.quantidade,
       })),
     });
+    toast.success("Pedido criado com sucesso!");
 
     emptyCart();
 

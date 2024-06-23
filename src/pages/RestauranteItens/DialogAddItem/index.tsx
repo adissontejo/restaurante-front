@@ -15,6 +15,7 @@ import { ControlledFormField } from "../../../components/Form";
 import { useRestaurante } from "../../../hooks/useRestaurante";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema } from "./constants";
+import { toast } from "react-toastify";
 
 interface DialogAddItemProps {
   item: CategoriaResponseDTO["itens"][number];
@@ -48,6 +49,7 @@ export const DialogAddItem: React.FC<DialogAddItemProps> = ({
       observacao: data.observacao,
       quantidade: data.quantidade,
     });
+    toast.success("Item adicionado ao carrinho!");
     handleClose();
   };
 
