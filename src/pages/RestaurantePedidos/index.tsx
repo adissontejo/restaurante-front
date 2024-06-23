@@ -1,5 +1,5 @@
-import { OrderList } from "./OrdersList";
+import { PedidosList } from "../../components/PedidosList";
 
 export const RestaurantePedidos = () => {
-  return <OrderList />;
+  return <PedidosList />;
 };

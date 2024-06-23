@@ -135,7 +135,8 @@ export const useForms = ({
         },
         {
           onSuccess(data) {
-            navigate(`/restaurante/${data.dominio}`);
+            toast.success("Restaurante criado com sucesso!");
+            navigate(`/restaurante/${data.dominio}/admin`);
           },
           onError() {
             toast.error("Erro ao criar restaurante");

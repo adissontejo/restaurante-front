@@ -39,7 +39,11 @@ export const theme = {
     },
     green: {
       100: "#B8D2C3",
+      400: "#478C64",
       500: "#196F3D",
+    },
+    yellow: {
+      600: "#E8B100",
     },
     text: {
       secondary: "rgba(0, 0, 0, 0.6)",

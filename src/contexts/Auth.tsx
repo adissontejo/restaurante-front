@@ -12,11 +12,7 @@ export interface AuthContextData {
 export const AuthContext = createContext<AuthContextData | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const {
-    data: usuario,
-    isLoading,
-    refetch: refetchUsuarioLogado,
-  } = usuarioLogadoQuery
+  const { data: usuario, isLoading } = usuarioLogadoQuery
     .options({
       retry: false,
     })
@@ -27,7 +23,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       onSuccess(data) {
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
-        refetchUsuarioLogado();
+        window.location.reload();
       },
     })
     .use();

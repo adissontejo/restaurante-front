@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { CreateRestaurante } from "./pages/CreateRestaurante";
 import { RestauranteHome } from "./pages/RestauranteHome";
@@ -13,6 +13,7 @@ import { SocketProvider } from "./contexts/Socket";
 import { RestauranteContaPedidos } from "./pages/RestauranteContaPedidos";
 import { RestaurantePedidos } from "./pages/RestaurantePedidos";
 import { HomeRestaurants } from "./pages/HomeRestaurants";
+import { RestauranteAdminHome } from "./pages/RestauranteAdminHome";
 
 const router = createBrowserRouter([
   {
@@ -35,41 +36,54 @@ const router = createBrowserRouter([
         path: "/restaurante/:dominio",
         element: (
           <RestauranteProvider>
-            <SocketProvider>
-              <AppContainer />
-            </SocketProvider>
+            <Outlet />
           </RestauranteProvider>
         ),
         children: [
           {
-            index: true,
-            element: <RestauranteHome />,
-          },
-          {
-            path: "cardapio",
-            element: <RestauranteItens />,
-          },
-          {
-            path: "carrinho",
-            element: <RestauranteCarrinho />,
-          },
-          {
-            path: "historico",
-            element: <RestauranteContaPedidos />,
+            element: <AppContainer />,
             children: [
               {
-                path: "conta",
-                element: <RestauranteContaMes />,
+                index: true,
+                element: <RestauranteHome />,
               },
               {
-                path: "pedidos",
-                element: <RestaurantePedidos />,
+                path: "cardapio",
+                element: <RestauranteItens />,
+              },
+              {
+                path: "carrinho",
+                element: <RestauranteCarrinho />,
+              },
+              {
+                path: "historico",
+                element: <RestauranteContaPedidos />,
+                children: [
+                  {
+                    path: "conta",
+                    element: <RestauranteContaMes />,
+                  },
+                  {
+                    path: "pedidos",
+                    element: <RestaurantePedidos />,
+                  },
+                ],
+              },
+              {
+                path: "conta",
+                element: <RestauranteContaCliente />,
               },
             ],
           },
           {
-            path: "conta",
-            element: <RestauranteContaCliente />,
+            path: "admin",
+            element: <AppContainer admin />,
+            children: [
+              {
+                index: true,
+                element: <RestauranteAdminHome />,
+              },
+            ],
           },
         ],
       },

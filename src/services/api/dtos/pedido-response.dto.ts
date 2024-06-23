@@ -6,4 +6,5 @@ export interface PedidoResponseDTO {
   numeroMesa: number;
   observacao: string | null;
   itens: ItemPedidoResponseDTO[];
+  iniciado: boolean;
 }
