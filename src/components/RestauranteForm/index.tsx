@@ -15,18 +15,24 @@ import { AddressStep } from "./AddressStep";
 import { useForms } from "./useForms";
 import { SchedulesStep } from "./SchedulesStep";
 import { CouponsStep } from "./CouponsStep";
+import { RestauranteResponseDTO } from "../../services/api/dtos/restaurante-response.dto";
 
 export interface RestauranteFormProps {
   type?: "create" | "update";
   currentSection?: "exhibition" | "address" | "schedules" | "coupons";
   onForward?: () => void;
   onBack?: () => void;
+  onChangeSection?: (section: RestauranteFormProps["currentSection"]) => void;
+  restaurante?: RestauranteResponseDTO;
 }
 
 export const RestauranteForm = ({
+  type = "create",
   currentSection,
   onForward,
   onBack,
+  onChangeSection,
+  restaurante,
 }: RestauranteFormProps) => {
   const {
     exhibitionForm,
@@ -39,6 +45,8 @@ export const RestauranteForm = ({
     currentSection,
     onBack,
     onForward,
+    type,
+    restaurante,
   });
 
   return (
@@ -46,14 +54,21 @@ export const RestauranteForm = ({
       <Wrapper>
         <Tabs>
           {sections.map((item, index) => (
-            <Tab key={index} active={currentSection === item.key}>
+            <Tab
+              key={index}
+              active={currentSection === item.key}
+              onClick={() => type === "update" && onChangeSection?.(item.key)}
+            >
               <TabLabel>{item.label}</TabLabel>
             </Tab>
           ))}
         </Tabs>
         <Step>
           {currentSection === "exhibition" && (
-            <ExhibitionStep form={exhibitionForm} />
+            <ExhibitionStep
+              form={exhibitionForm}
+              placeholderLogoUrl={restaurante?.logoUrl || undefined}
+            />
           )}
           {currentSection === "address" && <AddressStep form={addressForm} />}
           {currentSection === "schedules" && (
@@ -63,11 +78,17 @@ export const RestauranteForm = ({
         </Step>
         <Divider sx={{ marginTop: "auto" }} />
         <ButtonsWrapper>
-          {currentSection !== "exhibition" && (
-            <Button onClick={handlePreviousStep}>Voltar</Button>
+          {(type === "update" || currentSection !== "exhibition") && (
+            <Button onClick={handlePreviousStep}>
+              {type === "update" ? "Cancelar" : "Voltar"}
+            </Button>
           )}
           <Button variant="dark" onClick={handleNextStep}>
-            {currentSection === "coupons" ? "Criar" : "Continuar"}
+            {type === "update"
+              ? "Salvar"
+              : currentSection === "coupons"
+              ? "Criar"
+              : "Continuar"}
           </Button>
         </ButtonsWrapper>
       </Wrapper>

@@ -3,14 +3,20 @@ import { LeftPanel } from "../LeftPanel";
 import { Menu } from "./styles";
 import { theme } from "../../styles/theme";
 import { useRestaurante } from "../../hooks/useRestaurante";
-import { itemsMenu } from "./constants";
+import { itemsMenu, itemsMenuAdmin } from "./constants";
 import { MenuItem } from "./MenuItem";
 import { Fragment } from "react/jsx-runtime";
 import { useAuth } from "../../hooks/useAuth";
 
-export const LateralMenu = () => {
+export interface LateralMenuProps {
+  admin?: boolean;
+}
+
+export const LateralMenu = ({ admin }: LateralMenuProps) => {
   const { restaurante } = useRestaurante();
   const { usuario } = useAuth();
+
+  const itens = admin ? itemsMenuAdmin : itemsMenu;
 
   return (
     <LeftPanel>
@@ -28,12 +34,13 @@ export const LateralMenu = () => {
             alt="Logo do Restaurante"
             image={restaurante.logoUrl || ""}
             title="Logo do Restaurante"
+            sx={{ objectFit: "cover", width: "100%", height: "100%" }}
           />
         </Card>
-        {itemsMenu.map(({ icon, path }, index) => (
+        {itens.map(({ icon, path }, index) => (
           <Fragment key={index}>
             {usuario || path !== "conta" ? (
-              <MenuItem key={index} icon={icon} path={path} />
+              <MenuItem key={index} icon={icon} path={path} admin={admin} />
             ) : null}
           </Fragment>
         ))}

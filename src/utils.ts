@@ -11,7 +11,7 @@ export const formatDate = (date: Date) => {
 };
 
 export const formatTime = (date: Date) => {
-  return format(date, "HH:MM:ss");
+  return format(date, "HH:mm:ss");
 };
 
 export const calculaTotalPedido = (pedido: PedidoResponseDTO) => {

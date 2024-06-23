@@ -22,7 +22,7 @@ export const SchedulePicker = ({
   const popoverActions = useRef<PopoverActions>(null);
 
   const valueDisplay = useMemo(() => {
-    if (!value.length) {
+    if (!value?.length) {
       return "Fechado";
     }
 

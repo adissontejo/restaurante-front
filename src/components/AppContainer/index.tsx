@@ -24,7 +24,7 @@ export const AppContainer = ({ admin }: AppContainerProps) => {
     <SocketProvider admin={admin}>
       <Container>
         {admin && <LoginModal />}
-        <LateralMenu />
+        <LateralMenu admin={admin} />
         <Body>
           <Outlet />
         </Body>

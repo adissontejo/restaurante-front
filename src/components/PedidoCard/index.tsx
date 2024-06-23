@@ -6,6 +6,10 @@ import {
   Card,
   CardContent,
   IconButton,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import {
   ItemButton,
@@ -28,6 +32,9 @@ import { Status } from "./Status";
 import { StatusItemPedido } from "../../services/api/dtos/item-pedido-response.dto";
 import { useSocket } from "../../hooks/useSocket";
 import { toast } from "react-toastify";
+import { funcionarioQuery } from "../../services/api/funcionario";
+import { useRestaurante } from "../../hooks/useRestaurante";
+import { Cargo } from "../../services/api/dtos/create-funcionario.dto";
 
 interface PedidoCardProps {
   pedido: PedidoResponseDTO;
@@ -35,7 +42,11 @@ interface PedidoCardProps {
 }
 
 export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
-  const { startPedido, cancelItem, finishItem } = useSocket();
+  const { restaurante } = useRestaurante();
+  const { startPedido, cancelItem, finishItem, setFuncionarioResponsavel } =
+    useSocket();
+
+  const { data: funcionarios } = funcionarioQuery.params(restaurante.id).use();
 
   const [expanded, setExpanded] = useState(false);
   const [iconRotation, setIconRotation] = useState(0);
@@ -144,6 +155,33 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
             >
               {format(pedido.dataHora, "dd/MM/yyyy HH:mm:ss")}
             </Typography>
+            <FormControl>
+              <InputLabel id="responsavel-label">Responsável</InputLabel>
+              <Select
+                labelId="responsavel-label"
+                label="Responsável"
+                sx={{ width: 180 }}
+                onClick={(e) => e.stopPropagation()}
+                defaultValue={pedido.funcionarioResponsavel?.id}
+                value={pedido.funcionarioResponsavel?.id}
+                onChange={(e) =>
+                  setFuncionarioResponsavel(
+                    pedido.id,
+                    e.target.value as number
+                  ).then(() =>
+                    toast.success("Responsável alterado com sucesso!")
+                  )
+                }
+              >
+                {funcionarios
+                  ?.filter((item) => item.cargo === Cargo.GARCOM)
+                  ?.map((funcionario) => (
+                    <MenuItem value={funcionario.id}>
+                      {funcionario.usuario.nome}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
             {statusEl}
             <IconButton
               onClick={handleToggleDetails}

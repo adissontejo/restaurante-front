@@ -14,9 +14,13 @@ export interface ExhibitionFormData {
 
 export interface ExhibitionStepProps {
   form: UseFormReturn<ExhibitionFormData>;
+  placeholderLogoUrl?: string;
 }
 
-export const ExhibitionStep = ({ form }: ExhibitionStepProps) => {
+export const ExhibitionStep = ({
+  form,
+  placeholderLogoUrl,
+}: ExhibitionStepProps) => {
   const { control, watch } = form;
 
   const dominio = watch("dominio");
@@ -26,7 +30,12 @@ export const ExhibitionStep = ({ form }: ExhibitionStepProps) => {
   return (
     <Form>
       <GridItem>
-        <ControlledUploadImage control={control} name="logo" label="Logo" />
+        <ControlledUploadImage
+          control={control}
+          name="logo"
+          label="Logo"
+          placeholderUrl={placeholderLogoUrl}
+        />
       </GridItem>
       <ControlledFormField
         control={control}

@@ -21,34 +21,42 @@ export const sections = [
   },
 ] as const;
 
-export const exhibitionFormSchema = z
-  .object({
-    nome: z.string().min(3, "Nome muito curto!").max(100, "Nome muito longo!"),
-    dominio: z
-      .string()
-      .min(3, "Domínio muito curto!")
-      .max(20, "Domínio muito longo!")
-      .regex(
-        /^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$/,
-        "Domínio no formato incorreto!"
-      ),
-    descricao: z.string().max(400).optional(),
-  })
-  .superRefine(async (data, ctx) => {
-    if (data.dominio.length >= 3) {
-      const restaurante = await restauranteByDominioQuery
-        .params(data.dominio)
-        .fetch();
-
-      if (restaurante) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Domínio já existe!",
-          path: ["dominio"],
-        });
+export const exhibitionFormSchema = (currentDominio?: string) =>
+  z
+    .object({
+      nome: z
+        .string()
+        .min(3, "Nome muito curto!")
+        .max(100, "Nome muito longo!"),
+      dominio: z
+        .string()
+        .min(3, "Domínio muito curto!")
+        .max(20, "Domínio muito longo!")
+        .regex(
+          /^(?!-)[a-zA-Z0-9-]{1,63}(?<!-)$/,
+          "Domínio no formato incorreto!"
+        ),
+      descricao: z.string().max(400).optional(),
+    })
+    .superRefine(async (data, ctx) => {
+      if (data.dominio === currentDominio) {
+        return;
       }
-    }
-  });
+
+      if (data.dominio.length >= 3) {
+        const restaurante = await restauranteByDominioQuery
+          .params(data.dominio)
+          .fetch();
+
+        if (restaurante) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Domínio já existe!",
+            path: ["dominio"],
+          });
+        }
+      }
+    });
 
 export const addressFormSchema = z
   .object({

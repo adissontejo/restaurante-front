@@ -50,6 +50,8 @@ export const StepConnector = styled.div`
 `;
 
 export const Body = styled.div`
+  padding: 60px 80px;
+
   width: 100%;
   display: flex;
   flex-direction: column;

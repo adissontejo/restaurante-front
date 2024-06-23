@@ -1,21 +1,16 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  padding: 80px;
-
-  width: 100%;
-  max-height: 100%;
+  padding: 20px 0;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: auto;
 `;
 
 export const Wrapper = styled.div`
   flex: 1;
   width: 100%;
-  max-width: ${({ theme }) => theme.breakpoints.xl};
 
   display: flex;
   flex-direction: column;

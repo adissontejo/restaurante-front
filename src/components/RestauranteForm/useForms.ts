@@ -12,10 +12,16 @@ import { toast } from "react-toastify";
 import { SchedulesFormData } from "./SchedulesStep";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Horario } from "./SchedulesStep/SchedulePicker/ModalForm";
-import { createRestauranteMutation } from "../../services/api/restaurantes";
-import { useNavigate } from "react-router-dom";
+import {
+  createRestauranteMutation,
+  updateRestauranteMutation,
+} from "../../services/api/restaurantes";
+import { useNavigate, useParams } from "react-router-dom";
 import { WeekDays } from "../../constants";
 import { formatTime } from "../../utils";
+import { RestauranteResponseDTO } from "../../services/api/dtos/restaurante-response.dto";
+import { parse } from "date-fns";
+import { useEffect } from "react";
 
 export type Section = (typeof sections)[number]["key"];
 
@@ -23,41 +29,60 @@ export interface UseFormsProps {
   currentSection?: Section;
   onBack?: () => void;
   onForward?: () => void;
+  type: "create" | "update";
+  restaurante?: RestauranteResponseDTO;
 }
 
 export const useForms = ({
   currentSection,
   onBack,
   onForward,
+  type,
+  restaurante,
 }: UseFormsProps) => {
   const navigate = useNavigate();
 
-  const createRestaurante = createRestauranteMutation.use();
+  const { dominio } = useParams();
 
-  const exhibitionForm = useForm<ExhibitionFormData>({
-    resolver: zodResolver(exhibitionFormSchema),
-    mode: "onTouched",
-    defaultValues: {
-      nome: "",
-      dominio: "",
-      descricao: "",
+  const formDefaultValues = {
+    exhibition: {
+      nome: restaurante?.nome || "",
+      dominio: restaurante?.dominio || "",
+      descricao: restaurante?.descricao || "",
     },
-  });
-  const addressForm = useForm<AddressFormData>({
-    resolver: zodResolver(addressFormSchema),
-    mode: "onTouched",
-    defaultValues: {
-      cep: "",
-      cidade: "",
-      estado: "",
-      bairro: "",
-      complemento: "",
-      numero: "" as any,
-      rua: "",
+    address: {
+      cep: restaurante?.cep.replace(/^(\d{5})(\d{3})$/, "$1-$2") || "",
+      cidade: restaurante?.cidade || "",
+      estado: restaurante?.estado || "",
+      bairro: restaurante?.bairro || "",
+      complemento: restaurante?.complemento || "",
+      numero: restaurante?.numero || ("" as any),
+      rua: restaurante?.rua || "",
     },
-  });
-  const schedulesForm = useForm<SchedulesFormData>({
-    defaultValues: WeekDays.reduce((acc, day) => {
+    schedule: WeekDays.reduce((acc, day) => {
+      if (restaurante) {
+        const data = restaurante.horarios
+          .filter((item) => item.diaSemana === day.value)
+          .map((item) => {
+            const abertura = new Date(
+              parse(item.abertura, "HH:mm:ss", new Date())
+            );
+            const fechamento = new Date(
+              parse(item.fechamento, "HH:mm:ss", new Date())
+            );
+
+            return {
+              abertura,
+              fechamento,
+            };
+          });
+
+        return {
+          ...acc,
+          [day.value]: data,
+        };
+      }
+
       const abertura = new Date();
       const fechamento = new Date();
 
@@ -74,6 +99,30 @@ export const useForms = ({
         ],
       };
     }, {}),
+    coupons: {
+      enabled: (restaurante?.qtPedidosFidelidade ? "yes" : "no") as
+        | "yes"
+        | "no",
+      qtPedidosFidelidade: restaurante?.qtPedidosFidelidade || undefined,
+      valorFidelidade: restaurante?.valorFidelidade || undefined,
+    },
+  };
+
+  const createRestaurante = createRestauranteMutation.use();
+  const updateRestaurante = updateRestauranteMutation.use();
+
+  const exhibitionForm = useForm<ExhibitionFormData>({
+    resolver: zodResolver(exhibitionFormSchema(restaurante?.dominio)),
+    mode: "onTouched",
+    defaultValues: formDefaultValues.exhibition,
+  });
+  const addressForm = useForm<AddressFormData>({
+    resolver: zodResolver(addressFormSchema),
+    mode: "onTouched",
+    defaultValues: formDefaultValues.address,
+  });
+  const schedulesForm = useForm<SchedulesFormData>({
+    defaultValues: formDefaultValues.schedule,
   });
   const couponsForm = useForm<CoupounsFormData>({
     resolver: zodResolver(couponsFormSchema),
@@ -83,6 +132,13 @@ export const useForms = ({
     },
   });
 
+  const reset = () => {
+    exhibitionForm.reset(formDefaultValues.exhibition);
+    addressForm.reset(formDefaultValues.address);
+    schedulesForm.reset(formDefaultValues.schedule);
+    couponsForm.reset(formDefaultValues.coupons);
+  };
+
   const forms = {
     exhibition: exhibitionForm,
     address: addressForm,
@@ -90,6 +146,10 @@ export const useForms = ({
     coupons: couponsForm,
   };
   const currentForm = forms[currentSection || "exhibition"];
+
+  useEffect(() => {
+    reset();
+  }, [restaurante]);
 
   const handlePreviousStep = () => {
     onBack?.();
@@ -103,7 +163,8 @@ export const useForms = ({
         toast.error("Deve haver ao menos um horário!");
         return;
       }
-    } else if (currentSection === "coupons") {
+    }
+    if (type === "update" || currentSection === "coupons") {
       const exhibitionData = exhibitionForm.getValues();
       const addressData = addressForm.getValues();
       const schedulesData = schedulesForm.getValues();
@@ -119,21 +180,52 @@ export const useForms = ({
         });
       });
 
-      createRestaurante.mutate(
-        {
-          nome: exhibitionData.nome,
-          dominio: exhibitionData.dominio,
-          descricao: exhibitionData.descricao,
-          logo: exhibitionData.logo,
-          cep: addressData.cep.replace(/\D/g, ""),
-          complemento: addressData.complemento,
-          numero: addressData.numero,
-          rua: addressData.rua,
-          horarios,
-          qtPedidosFidelidade: couponsData.qtPedidosFidelidade,
-          valorFidelidade: couponsData.valorFidelidade,
-        },
-        {
+      const createData = {
+        nome: exhibitionData.nome,
+        dominio: exhibitionData.dominio,
+        descricao: exhibitionData.descricao,
+        logo: exhibitionData.logo,
+        cep: addressData.cep.replace(/\D/g, ""),
+        complemento: addressData.complemento,
+        numero: addressData.numero,
+        rua: addressData.rua,
+        horarios,
+        qtPedidosFidelidade: couponsData.qtPedidosFidelidade,
+        valorFidelidade: couponsData.valorFidelidade,
+      };
+
+      const updateData = (() => {
+        switch (currentSection) {
+          case "exhibition":
+            return {
+              nome: exhibitionData.nome,
+              dominio: exhibitionData.dominio,
+              descricao: exhibitionData.descricao,
+              logo: exhibitionData.logo,
+            };
+          case "address":
+            return {
+              cep: addressData.cep.replace(/\D/g, ""),
+              complemento: addressData.complemento,
+              numero: addressData.numero,
+              rua: addressData.rua,
+            };
+          case "schedules":
+            return {
+              horarios,
+            };
+          case "coupons":
+            return {
+              qtPedidosFidelidade: couponsData.qtPedidosFidelidade,
+              valorFidelidade: couponsData.valorFidelidade,
+            };
+          default:
+            return {};
+        }
+      })();
+
+      if (type === "create") {
+        createRestaurante.mutate(createData, {
           onSuccess(data) {
             toast.success("Restaurante criado com sucesso!");
             navigate(`/restaurante/${data.dominio}/admin`);
@@ -141,8 +233,26 @@ export const useForms = ({
           onError() {
             toast.error("Erro ao criar restaurante");
           },
-        }
-      );
+        });
+      } else {
+        updateRestaurante.mutate(
+          {
+            restaurante: updateData,
+            id: restaurante?.id || 0,
+          },
+          {
+            onSuccess() {
+              if (updateData.dominio && updateData.dominio !== dominio) {
+                navigate(`/restaurante/${updateData.dominio}/admin/dados`);
+              }
+              toast.success("Restaurante atualizado com sucesso!");
+            },
+            onError() {
+              toast.error("Erro ao atualizar restaurante");
+            },
+          }
+        );
+      }
 
       return;
     }
@@ -158,5 +268,6 @@ export const useForms = ({
     currentForm,
     handlePreviousStep,
     handleNextStep,
+    reset,
   };
 };

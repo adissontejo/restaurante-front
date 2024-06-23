@@ -8,9 +8,10 @@ import { theme } from "../../../styles/theme";
 export interface MenuItemProps {
   path: string;
   icon: FC<SVGProps<SVGSVGElement>>;
+  admin?: boolean;
 }
 
-export const MenuItem = ({ path, icon: Icon }: MenuItemProps) => {
+export const MenuItem = ({ path, icon: Icon, admin }: MenuItemProps) => {
   const { restaurante } = useRestaurante();
   const { pathname } = useLocation();
   const { dominio } = useParams();
@@ -19,7 +20,9 @@ export const MenuItem = ({ path, icon: Icon }: MenuItemProps) => {
   const isActive = useMemo(() => {
     const base = pathname.split("?")[0].replace(/\/$/, "");
 
-    const regex = new RegExp(`^\\/restaurante\\/${dominio}(\\/|)(.*)$`);
+    const regex = new RegExp(
+      `^\\/restaurante\\/${dominio}${admin ? "\\/admin" : ""}(\\/|)(.*)$`
+    );
 
     const active = base.match(regex)?.[2];
 
@@ -34,7 +37,7 @@ export const MenuItem = ({ path, icon: Icon }: MenuItemProps) => {
     <CardActionArea
       onClick={() =>
         navigate(
-          `/restaurante/${restaurante.dominio}/${
+          `/restaurante/${restaurante.dominio}${admin ? "/admin" : ""}/${
             path === "historico" ? "historico/conta" : path
           }`
         )

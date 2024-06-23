@@ -7,12 +7,17 @@ import { CreatePedidoDTO } from "../services/api/dtos/create-pedido.dto";
 import { PedidoResponseDTO } from "../services/api/dtos/pedido-response.dto";
 import { StatusItemPedido } from "../services/api/dtos/item-pedido-response.dto";
 import { toast } from "react-toastify";
+import { FuncionarioResponseDTO } from "../services/api/dtos/funcionario-response.dto";
 
 export interface SocketContextData {
   createPedido: (pedido: CreatePedidoDTO) => Promise<PedidoResponseDTO>;
   startPedido: (id: number) => Promise<void>;
   cancelItem: (id: number) => Promise<void>;
   finishItem: (id: number) => Promise<void>;
+  setFuncionarioResponsavel: (
+    pedidoId: number,
+    funcionarioResponsavelId: number
+  ) => Promise<void>;
   pedidos: PedidoResponseDTO[];
 }
 
@@ -25,7 +30,7 @@ export const SocketProvider = ({
   children: ReactNode;
   admin?: boolean;
 }) => {
-  const { restaurante } = useRestaurante();
+  const { restaurante, funcionarioLogado } = useRestaurante();
   const { usuario } = useAuth();
 
   const [pedidos, setPedidos] = useState<PedidoResponseDTO[]>([]);
@@ -74,6 +79,17 @@ export const SocketProvider = ({
             : item
         ),
       }))
+    );
+  };
+
+  const funcionarioResponsavelChanged = (
+    pedidoId: number,
+    funcionarioResponsavel: FuncionarioResponseDTO
+  ) => {
+    setPedidos((prev) =>
+      prev.map((pedido) =>
+        pedido.id === pedidoId ? { ...pedido, funcionarioResponsavel } : pedido
+      )
     );
   };
 
@@ -129,6 +145,24 @@ export const SocketProvider = ({
     });
   };
 
+  const setFuncionarioResponsavel = (
+    pedidoId: number,
+    funcionarioResponsavelId: number
+  ) => {
+    return new Promise<void>((resolve) => {
+      socket?.emit(
+        "set-funcionario-responsavel",
+        pedidoId,
+        funcionarioResponsavelId
+      );
+
+      socket?.once("set-funcionario-responsavel_response", (data) => {
+        funcionarioResponsavelChanged(pedidoId, data);
+        resolve();
+      });
+    });
+  };
+
   useEffect(() => {
     socket?.on("created", (data: PedidoResponseDTO) => {
       toast.info("Um novo pedido foi criado!");
@@ -155,11 +189,46 @@ export const SocketProvider = ({
       }
       itemFinished(id);
     });
+
+    socket?.on(
+      "funcionario-responsavel-changed",
+      (pedidoId: number, funcionarioResponsavel: FuncionarioResponseDTO) => {
+        const pedido = pedidos.find((item) => item.id === pedidoId);
+
+        if (
+          pedido?.funcionarioResponsavel?.id === funcionarioLogado?.id &&
+          funcionarioResponsavel.id !== funcionarioLogado?.id &&
+          admin
+        ) {
+          toast.info(
+            "Um dos seus pedidos foi removido da sua responsabilidade!"
+          );
+        } else if (
+          funcionarioResponsavel.id === funcionarioLogado?.id &&
+          admin
+        ) {
+          toast.info("Um novo pedido foi colocado sob sua responsabilidade!");
+        }
+
+        funcionarioResponsavelChanged(pedidoId, funcionarioResponsavel);
+      }
+    );
+
+    return () => {
+      socket?.disconnect();
+    };
   }, [socket]);
 
   return (
     <SocketContext.Provider
-      value={{ createPedido, startPedido, pedidos, cancelItem, finishItem }}
+      value={{
+        createPedido,
+        startPedido,
+        pedidos,
+        cancelItem,
+        finishItem,
+        setFuncionarioResponsavel,
+      }}
     >
       {children}
     </SocketContext.Provider>

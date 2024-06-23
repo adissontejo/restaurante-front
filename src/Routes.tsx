@@ -14,6 +14,7 @@ import { RestauranteContaPedidos } from "./pages/RestauranteContaPedidos";
 import { RestaurantePedidos } from "./pages/RestaurantePedidos";
 import { HomeRestaurants } from "./pages/HomeRestaurants";
 import { RestauranteAdminHome } from "./pages/RestauranteAdminHome";
+import { EditRestaurante } from "./pages/EditRestaurante";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <RestauranteAdminHome />,
+              },
+              {
+                path: "dados",
+                element: <EditRestaurante />,
               },
             ],
           },
