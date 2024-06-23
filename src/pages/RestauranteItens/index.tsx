@@ -1,51 +1,45 @@
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { Grid } from "@mui/material";
 import { CardItem } from "./CardItem";
-import { instanciasItens } from "../../data";
 import { TitleWithUnderline } from "../../components/TitleWithUnderline";
 import { ListTab } from "../../components/ListTab";
 import { useRestaurante } from "../../hooks/useRestaurante";
+import { categoriasQuery } from "../../services/api/categorias";
 
 export const RestauranteItens = () => {
   const { restaurante } = useRestaurante();
 
-  const items = instanciasItens.filter(
-    (instancia) =>
-      instancia.item.restauranteId == restaurante.id &&
-      instancia.item.habilitado &&
-      instancia.ativo
-  );
-  const categoriasSet = Array.from(
-    new Set(
-      instanciasItens
-        .filter(
-          (instancia) =>
-            instancia.item.restauranteId == restaurante.id &&
-            instancia.item.habilitado &&
-            instancia.ativo
-        )
-        .map((item) => item.item.categoria)
-    )
-  );
+  const { data: categorias } = categoriasQuery.params(restaurante.id).use();
 
-  const [activeCategory, setActiveCategory] = useState(categoriasSet[0]);
+  const listTabItems = useMemo(() => {
+    return categorias?.map((item, index) => ({
+      label: item.nome,
+      value: index,
+    }));
+  }, [categorias]);
 
-  const handleClickItemMenu = (categoria: string) => {
-    setActiveCategory(categoria);
-  };
+  const [activeCategory, setActiveCategory] = useState(0);
+
+  const items = useMemo(() => {
+    return categorias?.[activeCategory]?.itens.filter(
+      (item) => item.habilitado
+    );
+  }, [activeCategory, categorias]);
 
   return (
     <>
       <TitleWithUnderline text="Menu" />
-      <ListTab items={categoriasSet} handleClick={handleClickItemMenu} />
+      <ListTab
+        value={activeCategory}
+        items={listTabItems}
+        onChange={setActiveCategory}
+      />
       <Grid container spacing={12}>
-        {items.map((instancia, index) =>
-          instancia.item.categoria === activeCategory ? (
-            <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={index}>
-              <CardItem instanciaItem={instancia} />
-            </Grid>
-          ) : null
-        )}
+        {items?.map((item, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={index}>
+            <CardItem item={item} />
+          </Grid>
+        ))}
       </Grid>
     </>
   );

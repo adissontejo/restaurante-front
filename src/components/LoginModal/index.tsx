@@ -4,12 +4,12 @@ import { LoginButton } from "../LoginButton";
 import { useAuth } from "../../hooks/useAuth";
 
 export const LoginModal = () => {
-  const { usuario, login } = useAuth();
+  const { usuario } = useAuth();
 
   return (
     <Modal open={!usuario}>
       <Container title="Fazer login">
-        <LoginButton onClick={login} />
+        <LoginButton />
       </Container>
     </Modal>
   );

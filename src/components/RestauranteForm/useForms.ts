@@ -3,7 +3,6 @@ import { AddressFormData } from "./AddressStep";
 import { CoupounsFormData } from "./CouponsStep";
 import { ExhibitionFormData } from "./ExhibitionStep";
 import {
-  WeekDays,
   addressFormSchema,
   couponsFormSchema,
   exhibitionFormSchema,
@@ -13,9 +12,10 @@ import { toast } from "react-toastify";
 import { SchedulesFormData } from "./SchedulesStep";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Horario } from "./SchedulesStep/SchedulePicker/ModalForm";
-import { format } from "date-fns";
 import { createRestauranteMutation } from "../../services/api/restaurantes";
 import { useNavigate } from "react-router-dom";
+import { WeekDays } from "../../constants";
+import { formatTime } from "../../utils";
 
 export type Section = (typeof sections)[number]["key"];
 
@@ -112,8 +112,8 @@ export const useForms = ({
       const horarios = WeekDays.flatMap((item) => {
         return schedulesData[item.value].map((horario) => {
           return {
-            abertura: format(horario.abertura, "hh:mm"),
-            fechamento: format(horario.fechamento, "hh:mm"),
+            abertura: formatTime(horario.abertura),
+            fechamento: formatTime(horario.fechamento),
             diaSemana: item.value,
           };
         });

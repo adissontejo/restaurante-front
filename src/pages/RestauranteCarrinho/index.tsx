@@ -1,18 +1,9 @@
 import { ItemCartList } from "./ItemCartList";
 import { Grid } from "@mui/material";
 import { PaymentCard } from "./PaymentCard";
-import { useMemo } from "react";
-import { calculaTotalPedido } from "../../utils";
 import { TitleWithUnderline } from "../../components/TitleWithUnderline";
-import { useRestaurante } from "../../hooks/useRestaurante";
 
 export const RestauranteCarrinho = () => {
-  const { itensCarrinho } = useRestaurante();
-
-  const totalPedido = useMemo(() => {
-    return calculaTotalPedido(itensCarrinho);
-  }, [itensCarrinho]);
-
   return (
     <>
       <TitleWithUnderline text="Carrinho" />
@@ -21,7 +12,7 @@ export const RestauranteCarrinho = () => {
           <ItemCartList />
         </Grid>
         <Grid item xs={12} sm={8} md={4}>
-          <PaymentCard totalPedido={totalPedido} />
+          <PaymentCard />
         </Grid>
       </Grid>
     </>

@@ -21,9 +21,15 @@ export interface UploadImageProps {
   value?: File;
   onChange?: (value?: File) => void;
   label?: string;
+  placeholderUrl?: string;
 }
 
-export const UploadImage = ({ label, value, onChange }: UploadImageProps) => {
+export const UploadImage = ({
+  label,
+  value,
+  onChange,
+  placeholderUrl,
+}: UploadImageProps) => {
   const id = useId();
 
   return (
@@ -41,8 +47,10 @@ export const UploadImage = ({ label, value, onChange }: UploadImageProps) => {
         />
         <label htmlFor={id}>
           <ImageWrapper>
-            {value ? (
-              <Image src={URL.createObjectURL(value)} />
+            {value || placeholderUrl ? (
+              <Image
+                src={value ? URL.createObjectURL(value) : placeholderUrl}
+              />
             ) : (
               <IconWrapper>
                 <AddPhotoAlternate

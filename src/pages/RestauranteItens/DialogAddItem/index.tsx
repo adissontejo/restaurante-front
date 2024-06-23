@@ -1,41 +1,58 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Button,
-  Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
   Typography,
 } from "@mui/material";
 import { BoxImage, BoxTitle, ButtonsWrapper } from "./styles";
 import CrossSmall from "../../../assets/cross-small.svg?react";
-import { InstanciaItem } from "../../../data";
 import { theme } from "../../../styles/theme";
+import { CategoriaResponseDTO } from "../../../services/api/dtos/categoria-response.dto";
+import { useForm } from "react-hook-form";
+import { ControlledFormField } from "../../../components/Form";
+import { useRestaurante } from "../../../hooks/useRestaurante";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { schema } from "./constants";
 
 interface DialogAddItemProps {
-  instanciaItem: InstanciaItem;
-  open: boolean;
+  item: CategoriaResponseDTO["itens"][number];
   handleClose: () => void;
 }
 
+interface FormData {
+  quantidade: number;
+  observacao: string;
+}
+
 export const DialogAddItem: React.FC<DialogAddItemProps> = ({
-  instanciaItem,
-  open,
+  item,
   handleClose,
 }) => {
-  const [quantity, setQuantity] = useState<number | string>("");
-  const [observation, setObservation] = useState<string>("");
+  const { addCartItem } = useRestaurante();
+
+  const { control, handleSubmit } = useForm<FormData>({
+    defaultValues: {
+      quantidade: 1,
+    },
+    resolver: zodResolver(schema),
+    mode: "onTouched",
+  });
 
   // falta implementar acompanahmentos
 
-  const handleAdd = () => {
-    // Handle add item logic here
+  const handleAdd = (data: FormData) => {
+    addCartItem({
+      ...item,
+      observacao: data.observacao,
+      quantidade: data.quantidade,
+    });
     handleClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <>
       <DialogTitle style={{ display: "flex", justifyContent: "space-between" }}>
         <Typography
           variant="body1"
@@ -52,8 +69,8 @@ export const DialogAddItem: React.FC<DialogAddItemProps> = ({
         <BoxImage>
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <img
-              src={instanciaItem.item.urlImagem}
-              alt={instanciaItem.item.nome}
+              src={item.fotoUrl || ""}
+              alt={item.nome}
               style={{ width: "100%", height: "100px", objectFit: "cover" }}
             />
           </Box>
@@ -62,23 +79,27 @@ export const DialogAddItem: React.FC<DialogAddItemProps> = ({
           >
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
               {" "}
-              {instanciaItem.item.nome}
+              {item.nome}
             </Typography>
-            <Typography variant="body1"> + R$ {instanciaItem.preco}</Typography>
+            <Typography variant="body1">
+              {" "}
+              + R$ {item.instanciaAtiva.preco}
+            </Typography>
           </BoxTitle>
         </BoxImage>
-        <TextField
+        <ControlledFormField
+          control={control}
+          name="quantidade"
           label="Quantidade"
           type="number"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          required
           fullWidth
           sx={{ marginY: 1 }}
         />
-        <TextField
+        <ControlledFormField
+          control={control}
+          name="observacao"
           label="Alguma Observação?"
-          value={observation}
-          onChange={(e) => setObservation(e.target.value)}
           fullWidth
           sx={{ marginY: 1 }}
         />
@@ -109,12 +130,12 @@ export const DialogAddItem: React.FC<DialogAddItemProps> = ({
           <Button
             variant="contained"
             style={{ background: theme.colors.black[600], minWidth: "200px" }}
-            onClick={handleAdd}
+            onClick={handleSubmit(handleAdd)}
           >
             <Typography variant="button">Adicionar</Typography>
           </Button>
         </ButtonsWrapper>
       </DialogContent>
-    </Dialog>
+    </>
   );
 };

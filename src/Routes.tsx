@@ -9,6 +9,9 @@ import { RestauranteContaMes } from "./pages/RestauranteContaMes";
 import { RestauranteContaCliente } from "./pages/RestauranteContaCliente";
 import { App } from "./App";
 import { RestauranteProvider } from "./contexts/Restaurante";
+import { SocketProvider } from "./contexts/Socket";
+import { RestauranteContaPedidos } from "./pages/RestauranteContaPedidos";
+import { RestaurantePedidos } from "./pages/RestaurantePedidos";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +30,9 @@ const router = createBrowserRouter([
         path: "/restaurante/:dominio",
         element: (
           <RestauranteProvider>
-            <AppContainer />
+            <SocketProvider>
+              <AppContainer />
+            </SocketProvider>
           </RestauranteProvider>
         ),
         children: [
@@ -45,7 +50,17 @@ const router = createBrowserRouter([
           },
           {
             path: "historico",
-            element: <RestauranteContaMes />,
+            element: <RestauranteContaPedidos />,
+            children: [
+              {
+                path: "conta",
+                element: <RestauranteContaMes />,
+              },
+              {
+                path: "pedidos",
+                element: <RestaurantePedidos />,
+              },
+            ],
           },
           {
             path: "conta",

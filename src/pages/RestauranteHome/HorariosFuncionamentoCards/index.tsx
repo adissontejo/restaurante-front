@@ -1,28 +1,29 @@
-import React from "react";
+import React, { Fragment, useMemo } from "react";
 import { Card, CardContent, Typography, Grid } from "@mui/material";
 import { CardHours } from "./styles";
 import { theme } from "../../../styles/theme";
+import { WeekDays } from "../../../constants";
+import { HorarioRestauranteResponseDTO } from "../../../services/api/dtos/horario-restaurante-response.dto";
 
 interface HorariosFuncionamentoProps {
-  horarios: {
-    abertura: string;
-    fechamento: string;
-    diaSemana: string;
-  }[];
+  horarios: HorarioRestauranteResponseDTO[];
 }
 
 export const HorariosFuncionamento: React.FC<HorariosFuncionamentoProps> = ({
   horarios,
 }) => {
-  const diasSemanaCompleto = [
-    "Domingo",
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado",
-  ];
+  const horariosByDiaSemana = useMemo(() => {
+    return WeekDays.map((item) => {
+      return horarios
+        .filter((horario) => horario.diaSemana === item.value)
+        .map(
+          (horario) =>
+            `${formatTime(horario.abertura)} às ${formatTime(
+              horario.fechamento
+            )}`
+        );
+    });
+  }, [horarios]);
 
   return (
     <CardHours>
@@ -30,11 +31,11 @@ export const HorariosFuncionamento: React.FC<HorariosFuncionamentoProps> = ({
         Nossos horários de funcionamento
       </Typography>
       <Grid container spacing={4}>
-        {horarios.map((horario, index) => (
-          <Grid item xs={12} sm={1.71} key={index}>
+        {WeekDays.map((item, index) => (
+          <Grid item sx={{ height: "100%" }} xs={12} sm={1.71} key={index}>
             <Card
               variant="elevation"
-              sx={{ borderRadius: "24px", boxShadow: 3 }}
+              sx={{ borderRadius: "24px", boxShadow: 3, height: "100%" }}
             >
               <CardContent>
                 <Typography
@@ -43,15 +44,21 @@ export const HorariosFuncionamento: React.FC<HorariosFuncionamentoProps> = ({
                   variant="body2"
                   style={{ color: theme.colors.black[500], fontWeight: 800 }}
                 >
-                  {diasSemanaCompleto[index]}
+                  {item.label}
                 </Typography>
                 <Typography
                   textAlign="center"
                   variant="body2"
                   color={theme.colors.black[300]}
                 >
-                  {formatTime(horario.abertura)} às{" "}
-                  {formatTime(horario.fechamento)}
+                  {horariosByDiaSemana[index].length
+                    ? horariosByDiaSemana[index].map((horario, index) => (
+                        <Fragment key={index}>
+                          {index > 0 && <br />}
+                          <span>{horario}</span>
+                        </Fragment>
+                      ))
+                    : "Fechado"}
                 </Typography>
               </CardContent>
             </Card>

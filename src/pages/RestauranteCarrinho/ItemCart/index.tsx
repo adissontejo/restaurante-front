@@ -5,23 +5,20 @@ import Plus from "../../../assets/plus.svg?react";
 import Minus from "../../../assets/minus.svg?react";
 import AngleSmallDown from "../../../assets/angle-small-down.svg?react";
 import { theme } from "../../../styles/theme";
-import { ItemPedido } from "../../../data";
+import { useRestaurante } from "../../../hooks/useRestaurante";
 
 interface ItemCartProps {
-  itemPedido: ItemPedido;
-  onIncrement: (id: number) => void;
-  onDecrement: (id: number) => void;
+  index: number;
 }
 
-export const ItemCart: React.FC<ItemCartProps> = ({
-  itemPedido,
-  onIncrement,
-  onDecrement,
-}) => {
+export const ItemCart: React.FC<ItemCartProps> = ({ index }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [iconRotation, setIconRotation] = useState(0);
 
-  const item = itemPedido.instanciaItem.item;
+  const { itensCarrinho, incrementCartItem, decrementCartItem } =
+    useRestaurante();
+
+  const item = itensCarrinho[index];
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
@@ -32,7 +29,7 @@ export const ItemCart: React.FC<ItemCartProps> = ({
     <>
       <ItemContainer>
         <Box sx={{ width: "60%", display: "flex", gap: "8px" }}>
-          <ItemImage src={item.urlImagem} alt={item.nome} />
+          <ItemImage src={item.fotoUrl || ""} alt={item.nome} />
           <Box>
             <Typography
               variant="h6"
@@ -44,13 +41,13 @@ export const ItemCart: React.FC<ItemCartProps> = ({
               variant="body2"
               sx={{ color: theme.colors.black[400], fontWeight: 500 }}
             >
-              R$ {itemPedido.instanciaItem.preco} x {itemPedido.quantidade} = R${" "}
-              {itemPedido.quantidade * itemPedido.instanciaItem.preco}
+              R$ {item.instanciaAtiva.preco} x {item.quantidade} = R${" "}
+              {item.quantidade * item.instanciaAtiva.preco}
             </Typography>
           </Box>
         </Box>
         <Box display="flex" alignItems="center">
-          <CountButton onClick={() => onDecrement(itemPedido.id)}>
+          <CountButton onClick={() => decrementCartItem(index)}>
             <Minus
               style={{
                 color: theme.colors.black[500],
@@ -64,10 +61,10 @@ export const ItemCart: React.FC<ItemCartProps> = ({
               variant="body2"
               sx={{ mx: 2, color: theme.colors.black[500], fontWeight: 800 }}
             >
-              {itemPedido.quantidade}
+              {item.quantidade}
             </Typography>
           </BoxNumber>
-          <CountButton onClick={() => onIncrement(itemPedido.id)}>
+          <CountButton onClick={() => incrementCartItem(index)}>
             <Plus style={{ color: theme.colors.black[500], height: "16px" }} />
           </CountButton>
         </Box>
@@ -100,7 +97,7 @@ export const ItemCart: React.FC<ItemCartProps> = ({
           }}
         >
           {" "}
-          {itemPedido.observacao}{" "}
+          {item.observacao}{" "}
         </Typography>
       </Collapse>
     </>

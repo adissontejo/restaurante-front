@@ -25,4 +25,4 @@ export const itemsMenu = [
     icon: UserManager,
     path: "conta",
   },
-];
+] as const;

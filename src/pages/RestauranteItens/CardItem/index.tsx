@@ -1,16 +1,22 @@
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Dialog,
+  Typography,
+} from "@mui/material";
 import { CardItemDiv, CardWrapper, IconContainer, IconDiv } from "./styles";
 import React, { useState } from "react";
 import Plus from "../../../assets/plus.svg?react";
 import { DialogAddItem } from "../DialogAddItem";
 import { theme } from "../../../styles/theme";
-import { InstanciaItem } from "../../../data";
+import { CategoriaResponseDTO } from "../../../services/api/dtos/categoria-response.dto";
 
 interface CardItemProps {
-  instanciaItem: InstanciaItem;
+  item: CategoriaResponseDTO["itens"][number];
 }
 
-export const CardItem: React.FC<CardItemProps> = ({ instanciaItem }) => {
+export const CardItem: React.FC<CardItemProps> = ({ item }) => {
   const [hovered, setHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -36,7 +42,7 @@ export const CardItem: React.FC<CardItemProps> = ({ instanciaItem }) => {
           >
             <CardMedia
               component="img"
-              image={instanciaItem.item.urlImagem}
+              image={item.fotoUrl || ""}
               style={{ height: "100%", width: "100%", objectFit: "cover" }}
             />
             <IconContainer
@@ -56,20 +62,18 @@ export const CardItem: React.FC<CardItemProps> = ({ instanciaItem }) => {
             color={theme.colors.black[600]}
             fontWeight={800}
           >
-            {instanciaItem.item.nome}
+            {item.nome}
           </Typography>
           <Typography variant="body1" color={theme.colors.black[400]}>
             {" "}
-            R$ {instanciaItem.preco}{" "}
+            R$ {item.instanciaAtiva.preco}{" "}
           </Typography>
         </CardContent>
       </CardItemDiv>
 
-      <DialogAddItem
-        instanciaItem={instanciaItem}
-        handleClose={handleToogleModal}
-        open={showModal}
-      />
+      <Dialog open={showModal}>
+        <DialogAddItem item={item} handleClose={handleToogleModal} />
+      </Dialog>
     </>
   );
 };

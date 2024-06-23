@@ -5,9 +5,12 @@ import { theme } from "../../styles/theme";
 import { useRestaurante } from "../../hooks/useRestaurante";
 import { itemsMenu } from "./constants";
 import { MenuItem } from "./MenuItem";
+import { Fragment } from "react/jsx-runtime";
+import { useAuth } from "../../hooks/useAuth";
 
 export const LateralMenu = () => {
   const { restaurante } = useRestaurante();
+  const { usuario } = useAuth();
 
   return (
     <LeftPanel>
@@ -28,7 +31,11 @@ export const LateralMenu = () => {
           />
         </Card>
         {itemsMenu.map(({ icon, path }, index) => (
-          <MenuItem key={index} icon={icon} path={path} />
+          <Fragment key={index}>
+            {usuario || path !== "conta" ? (
+              <MenuItem key={index} icon={icon} path={path} />
+            ) : null}
+          </Fragment>
         ))}
       </Menu>
     </LeftPanel>

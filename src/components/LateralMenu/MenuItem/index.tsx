@@ -17,23 +17,28 @@ export const MenuItem = ({ path, icon: Icon }: MenuItemProps) => {
   const navigate = useNavigate();
 
   const isActive = useMemo(() => {
-    const base = pathname.split(/(\/\?|\?)/)[0];
+    const base = pathname.split("?")[0].replace(/\/$/, "");
 
-    if (path === "") {
-      return (
-        base === `/restaurante/${dominio}` || base === `restaurante/${dominio}/`
-      );
+    const regex = new RegExp(`^\\/restaurante\\/${dominio}(\\/|)(.*)$`);
+
+    const active = base.match(regex)?.[2];
+
+    if (path === "historico") {
+      return !!active?.startsWith("historico");
     }
 
-    return (
-      base === `/restaurante/${dominio}/${path}` ||
-      base === `/restaurante/${dominio}/${path}/`
-    );
+    return active === path;
   }, [dominio, pathname]);
 
   return (
     <CardActionArea
-      onClick={() => navigate(`/restaurante/${restaurante.dominio}/${path}`)}
+      onClick={() =>
+        navigate(
+          `/restaurante/${restaurante.dominio}/${
+            path === "historico" ? "historico/conta" : path
+          }`
+        )
+      }
     >
       <Container active={isActive}>
         <Icon style={{ color: theme.colors.white[500] }} />

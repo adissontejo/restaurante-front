@@ -9,18 +9,19 @@ import {
 } from "@mui/material";
 import { ItemDetail, Line, VerticalLine } from "./styles";
 import AngleSmallDown from "../../../assets/angle-small-down.svg?react";
-import { Pedido } from "../../../data";
 import { theme } from "../../../styles/theme";
-import { calculaTotalPedido, formatDate, formatTime } from "../../../utils";
+import { calculaTotalPedido } from "../../../utils";
+import { PedidoResponseDTO } from "../../../services/api/dtos/pedido-response.dto";
+import { format } from "date-fns";
 
 interface OrderListItemProps {
-  pedido: Pedido;
+  pedido: PedidoResponseDTO;
 }
 
 export const OrderListItem: React.FC<OrderListItemProps> = ({ pedido }) => {
   const [expanded, setExpanded] = useState(false);
   const [iconRotation, setIconRotation] = useState(0);
-  const valorTotal = calculaTotalPedido(pedido.items);
+  const valorTotal = calculaTotalPedido(pedido);
 
   const handleToggleDetails = () => {
     setExpanded(!expanded);
@@ -51,7 +52,7 @@ export const OrderListItem: React.FC<OrderListItemProps> = ({ pedido }) => {
               variant="body1"
               style={{ color: theme.colors.black[300], fontWeight: 600 }}
             >
-              {pedido.items.reduce((acc, item) => acc + item.quantidade, 0)}{" "}
+              {pedido.itens.reduce((acc, item) => acc + item.quantidade, 0)}{" "}
               ITENS
             </Typography>
             <VerticalLine />
@@ -59,7 +60,7 @@ export const OrderListItem: React.FC<OrderListItemProps> = ({ pedido }) => {
               variant="body1"
               style={{ color: theme.colors.black[300], fontWeight: 600 }}
             >
-              {formatDate(pedido.dataHora)} - {formatTime(pedido.dataHora)}
+              {format(pedido.dataHora, "dd/MM/yyyy HH:mm:ss")}
             </Typography>
             <IconButton
               onClick={handleToggleDetails}
@@ -79,7 +80,7 @@ export const OrderListItem: React.FC<OrderListItemProps> = ({ pedido }) => {
       </Card>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Card sx={{ borderRadius: "24px", boxShadow: 3 }}>
-          {pedido.items.map((itemPedido, itemIndex) => (
+          {pedido.itens.map((itemPedido, itemIndex) => (
             <React.Fragment key={itemPedido.id}>
               <ItemDetail>
                 <Box mb={1}>
@@ -107,7 +108,7 @@ export const OrderListItem: React.FC<OrderListItemProps> = ({ pedido }) => {
                   {itemPedido.quantidade > 1 ? "PORÇÕES" : "PORÇÃO"}
                 </Typography>
               </ItemDetail>
-              {pedido.items.length != itemIndex + 1 && <Line />}
+              {pedido.itens.length != itemIndex + 1 && <Line />}
             </React.Fragment>
           ))}
         </Card>

@@ -12,12 +12,20 @@ import {
 } from "@mui/material";
 import { BoxContent, BoxHeader } from "./styles";
 import { theme } from "../../../styles/theme";
+import { useSocket } from "../../../hooks/useSocket";
+import { useRestaurante } from "../../../hooks/useRestaurante";
+import { useNavigate, useParams } from "react-router-dom";
 
-interface PaymentCardProps {
-  totalPedido: number;
-}
+interface PaymentCardProps {}
 
-export const PaymentCard: React.FC<PaymentCardProps> = ({ totalPedido }) => {
+export const PaymentCard: React.FC<PaymentCardProps> = () => {
+  const { createPedido } = useSocket();
+  const { restaurante, itensCarrinho, totalPedido, emptyCart } =
+    useRestaurante();
+
+  const navigate = useNavigate();
+  const { dominio } = useParams();
+
   const [selectedCoupon, setSelectedCoupon] = useState<string>("");
   const [discount, setDiscount] = useState<number>(0);
 
@@ -34,9 +42,25 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ totalPedido }) => {
     console.log(`Coupon applied: ${selectedCoupon}`);
   };
 
-  const handleConfirm = () => {
-    // Aqui você pode adicionar a lógica para confirmar a compra
-    console.log("Purchase confirmed");
+  const handleConfirm = async () => {
+    if (!itensCarrinho.length) {
+      return;
+    }
+
+    await createPedido({
+      numeroMesa: 40,
+      funcionarioId: 2,
+      restauranteId: restaurante.id,
+      itens: itensCarrinho.map((item) => ({
+        instanciaItemId: item.instanciaAtiva.id,
+        observacao: item.observacao,
+        quantidade: item.quantidade,
+      })),
+    });
+
+    emptyCart();
+
+    navigate(`/restaurante/${dominio}/historico/pedidos`);
   };
 
   return (

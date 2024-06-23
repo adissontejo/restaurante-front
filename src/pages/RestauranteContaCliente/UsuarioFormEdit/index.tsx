@@ -1,63 +1,66 @@
-import React, { useState } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  Avatar,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
-import EditIcon from "../../../assets/pencil.svg?react";
+import { useEffect } from "react";
+import { Container, Box, Typography, Button, Grid } from "@mui/material";
 import SignOutAlt from "../../../assets/sign-out-alt.svg?react";
 import { BoxHeader, ButtonsWrapper, VerticalLine } from "./styles";
-import CrossSmall from "../../../assets/cross-small.svg?react";
-import { Usuario } from "../../../data";
 import { theme } from "../../../styles/theme";
 import { useAuth } from "../../../hooks/useAuth";
+import { useForm } from "react-hook-form";
+import { ControlledFormField } from "../../../components/Form";
+import { Navigate, useParams } from "react-router-dom";
+import { ControlledUploadImage } from "../../../components/UploadImage";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { schema } from "./constants";
+import { updateUsuarioMutation } from "../../../services/api/usuarios";
+
+interface FormData {
+  nome: string;
+  email: string;
+  fotoPerfil: File;
+}
 
 export const UsuarioFormEdit = () => {
   const { usuario } = useAuth();
 
-  const [formData, setFormData] = useState<Usuario>(usuario);
-  const [imageSelected, setImageSelected] = useState(usuario.fotoPerfilUrl);
-  const [open, setOpen] = useState(false);
+  const { control, reset, handleSubmit } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    mode: "onTouched",
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { dominio } = useParams();
 
-  const handleSave = () => {
-    console.log("Dados salvos:", formData);
+  const updateUsuario = updateUsuarioMutation.use();
+
+  useEffect(() => {
+    reset(usuario);
+  }, [usuario]);
+
+  const handleSave = async (data: FormData) => {
+    if (!usuario) {
+      return;
+    }
+
+    updateUsuario.mutate({
+      id: usuario.id,
+      usuario: {
+        ...data,
+        fotoPerfil: data.fotoPerfil || undefined,
+      },
+    });
   };
 
   const handleCancel = () => {
-    setFormData(usuario);
+    reset(usuario);
   };
 
   const handleLogout = () => {
-    console.log("sai");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    window.location.reload();
   };
 
-  //imagem
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setImageSelected(URL.createObjectURL(event.target.files[0]));
-      handleClose();
-    }
-  };
+  if (!usuario) {
+    return <Navigate to={`/restaurante/${dominio}`} />;
+  }
 
   return (
     <Container
@@ -72,31 +75,17 @@ export const UsuarioFormEdit = () => {
             borderRadius: "50%",
           }}
         >
-          <Avatar
-            src={imageSelected || ""}
-            alt={formData.nome}
-            sx={{ width: 140, height: 140 }}
+          <ControlledUploadImage
+            control={control}
+            name="fotoPerfil"
+            placeholderUrl={usuario.fotoPerfilUrl || undefined}
           />
-          <IconButton
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              right: 0,
-              backgroundColor: "white",
-              borderRadius: "15px",
-              padding: "12px 16px",
-              background: theme.colors.brown[400],
-            }}
-            onClick={() => handleOpen()}
-          >
-            <EditIcon height={16} width={16} />
-          </IconButton>
         </Box>
         <Typography
           variant="h4"
           sx={{ color: theme.colors.black[600], fontWeight: 700 }}
         >
-          {formData.nome}
+          {usuario?.nome}
         </Typography>
         <VerticalLine />
         <Button
@@ -115,25 +104,25 @@ export const UsuarioFormEdit = () => {
       <Grid component="form" container spacing={8}>
         <Grid item xs={16} sm={8} md={4}>
           {" "}
-          <TextField
+          <ControlledFormField
+            control={control}
             name="nome"
             label="Nome"
-            value={formData.nome}
-            onChange={handleChange}
             fullWidth
           />{" "}
         </Grid>
         <Grid item xs={16} sm={6} md={8}>
           {" "}
-          <TextField
+          <ControlledFormField
+            control={control}
             name="email"
             label="Email"
-            value={formData.email}
-            onChange={handleChange}
             fullWidth
+            disabled
           />
         </Grid>
-        <Grid item xs={16} sm={6} md={6}>
+        {/*
+          <Grid item xs={16} sm={6} md={6}>
           <TextField
             name="dataNascimento"
             label="Data de Nascimento"
@@ -152,6 +141,7 @@ export const UsuarioFormEdit = () => {
             fullWidth
           />
         </Grid>
+        */}
       </Grid>
       <ButtonsWrapper>
         <Button
@@ -169,35 +159,11 @@ export const UsuarioFormEdit = () => {
         <Button
           variant="contained"
           style={{ background: theme.colors.black[600], minWidth: "200px" }}
-          onClick={handleSave}
+          onClick={handleSubmit(handleSave)}
         >
           <Typography variant="button">Salvar</Typography>
         </Button>
       </ButtonsWrapper>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle
-          style={{ display: "flex", justifyContent: "space-between" }}
-        >
-          <Typography
-            variant="body1"
-            style={{ color: theme.colors.black[600], fontWeight: 600 }}
-          >
-            {" "}
-            Selecionar Imagem{" "}
-          </Typography>
-          <CrossSmall onClick={handleClose} />
-        </DialogTitle>
-        <DialogContent>
-          <Button
-            variant="outlined"
-            component="label"
-            style={{ padding: "16px 80px" }}
-          >
-            Buscar Arquivo
-            <input type="file" hidden onChange={handleFileChange} />
-          </Button>
-        </DialogContent>
-      </Dialog>
     </Container>
   );
 };

@@ -1,10 +1,4 @@
-import { DiaSemana } from "./restaurante";
-
-export interface CreateHorarioRestaurateDTO {
-  abertura: string;
-  fechamento: string;
-  diaSemana: DiaSemana;
-}
+import { CreateHorarioRestaurateDTO } from "./create-horario-restaurante.dto";
 
 export interface CreateRestauranteDTO {
   nome: string;

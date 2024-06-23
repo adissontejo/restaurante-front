@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { restauranteByDominioQuery } from "../../services/api/restaurantes";
 import { cepQuery } from "../../services/viacep";
-import { DiaSemana } from "../../services/api/dtos/restaurante";
 
 export const sections = [
   {
@@ -21,37 +20,6 @@ export const sections = [
     label: "Cupons",
   },
 ] as const;
-
-export const WeekDays = [
-  {
-    label: "Segunda-Feira",
-    value: DiaSemana.seg,
-  },
-  {
-    label: "Terça-Feira",
-    value: DiaSemana.ter,
-  },
-  {
-    label: "Quarta-Feira",
-    value: DiaSemana.qua,
-  },
-  {
-    label: "Quinta-Feira",
-    value: DiaSemana.qui,
-  },
-  {
-    label: "Sexta-Feira",
-    value: DiaSemana.sex,
-  },
-  {
-    label: "Sábado",
-    value: DiaSemana.sab,
-  },
-  {
-    label: "Domingo",
-    value: DiaSemana.dom,
-  },
-];
 
 export const exhibitionFormSchema = z
   .object({
