@@ -32,6 +32,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.23.1",
     "react-toastify": "^10.0.5",
+    "socket.io-client": "^4.7.5",
     "styled-components": "^6.1.11",
     "vite-plugin-svgr": "^4.2.0",
     "zod": "^3.23.8"

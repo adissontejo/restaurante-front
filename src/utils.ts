@@ -1,40 +1,78 @@
-import { ItemPedido } from "./data";
+import { format } from "date-fns";
+import { PedidoResponseDTO } from "./services/api/dtos/pedido-response.dto";
 
 export const formatDate = (date: Date) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(date).toLocaleDateString(undefined, options);
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return new Date(date).toLocaleDateString(undefined, options);
 };
 
 export const formatTime = (date: Date) => {
-    const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
-    return new Date(date).toLocaleTimeString(undefined, options);
+  return format(date, "HH:MM:ss");
 };
 
-export const calculaTotalPedido = (items: ItemPedido[]) => {
-    let valorTotal = 0;
-    items.forEach(item => {
-        const subtotal = item.instanciaItem.preco * item.quantidade;
-        valorTotal += subtotal;
-    });
-    return valorTotal;
+export const calculaTotalPedido = (pedido: PedidoResponseDTO) => {
+  let valorTotal = 0;
+  pedido.itens.forEach((item) => {
+    const subtotal = item.instanciaItem.preco * item.quantidade;
+    valorTotal += subtotal;
+  });
+  return valorTotal;
 };
 
+export const formatarEndereco = (
+  rua: string,
+  numero: number,
+  complemento: string | null,
+  cep: string,
+  bairro: string,
+  cidade: string,
+  estado: string
+): string => {
+  let enderecoFormatado = `${rua}, ${numero}`;
 
-export const formatarEndereco = (rua: String, numero: number, complemento: String | null, cep: String, bairro: String, cidade: String, estado: String): string => {
-    let enderecoFormatado = `${rua}, ${numero}`;
+  if (complemento) {
+    enderecoFormatado += `, ${complemento}`;
+  }
 
-    if (complemento) {
-        enderecoFormatado += `, ${complemento}`;
+  enderecoFormatado += `, ${bairro}, ${cep}, ${cidade} - ${estado}`;
+
+  return enderecoFormatado;
+};
+
+export const truncateDescription = (
+  description: string,
+  maxLength: number
+): string => {
+  if (description.length > maxLength) {
+    return description.slice(0, maxLength - 3) + "...";
+  }
+  return description;
+};
+
+export const groupArray = <T, R = T[]>(
+  data: T[],
+  {
+    by,
+    format = (group) => group as R,
+  }: { by: (item: T) => any; format?: (group: T[]) => R }
+) => {
+  const map = new Map<any, T[]>();
+
+  data.forEach((item) => {
+    const key = by(item);
+    let group = map.get(key);
+    if (!group) {
+      group = [];
     }
+    group.push(item);
+    map.set(key, group);
+  });
 
-    enderecoFormatado += `, ${bairro}, ${cep}, ${cidade} - ${estado}`;
+  const groups = Array.from(map.values());
 
-    return enderecoFormatado;
-};
-
-export const truncateDescription = (description: string, maxLength: number): string => {
-    if (description.length > maxLength) {
-        return description.slice(0, maxLength - 3) + '...';
-    }
-    return description;
+  return groups.map(format);
 };

@@ -2,22 +2,32 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { ReactNode, createContext } from "react";
 import { loginMutation } from "../services/api/auth";
 import { usuarioLogadoQuery } from "../services/api/usuarios";
+import { UsuarioResponseDTO } from "../services/api/dtos/usuario-response.dto";
 
 export interface AuthContextData {
-  usuario: any;
+  usuario: UsuarioResponseDTO | undefined;
   login: () => void;
 }
 
 export const AuthContext = createContext<AuthContextData | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { data: usuario, refetch } = usuarioLogadoQuery.use();
+  const {
+    data: usuario,
+    isLoading,
+    refetch: refetchUsuarioLogado,
+  } = usuarioLogadoQuery
+    .options({
+      retry: false,
+    })
+    .use();
 
   const login = loginMutation
     .options({
       onSuccess(data) {
-        localStorage.setItem("token", data.accessToken);
-        refetch();
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+        refetchUsuarioLogado();
       },
     })
     .use();
@@ -26,6 +36,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     flow: "auth-code",
     onSuccess: ({ code }) => login.mutate(code),
   });
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider value={{ usuario, login: googleLogin }}>

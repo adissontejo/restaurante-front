@@ -1,6 +1,5 @@
 import { ThemeProvider as MuiThemeProvider } from "@mui/material";
 import { muiTheme, theme } from "./styles/theme";
-import { Routes } from "./Routes";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { ThemeProvider } from "styled-components";
@@ -11,6 +10,7 @@ import { ToastContainer } from "react-toastify";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./contexts/Auth";
+import { Outlet } from "react-router-dom";
 
 export const App = () => {
   return (
@@ -23,7 +23,6 @@ export const App = () => {
             >
               <AuthProvider>
                 <GlobalStyles />
-                <Routes />
                 <ToastContainer
                   position="top-right"
                   autoClose={5000}
@@ -36,6 +35,7 @@ export const App = () => {
                   pauseOnHover
                   theme="light"
                 />
+                <Outlet />
               </AuthProvider>
             </GoogleOAuthProvider>
           </LocalizationProvider>

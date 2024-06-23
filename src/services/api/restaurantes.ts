@@ -1,17 +1,27 @@
 import { api } from "./base";
-import { CreateRestauranteDTO } from "./dtos/create-restaurante";
 import { serialize } from "object-to-formdata";
 import { createMutation, createQuery } from "../queries/client";
+import { RestauranteResponseDTO } from "./dtos/restaurante-response.dto";
+import { CreateRestauranteDTO } from "./dtos/create-restaurante.dto";
 
-export const restauranteByDominioQuery = createQuery((dominio: string) => ({
+export const restaurantesQuery = createQuery({
+  staleTime: 10 * 60 * 1000,
+  queryKey: ["restaurantes"],
+  queryFn: () =>
+    api
+      .get<RestauranteResponseDTO[]>("/restaurantes")
+      .then((response) => response.data),
+});
+
+export const restauranteByDominioQuery = createQuery((dominio?: string) => ({
   staleTime: 10 * 60 * 1000,
   queryKey: ["restaurante", "by-dominio", dominio],
   queryFn: () =>
     api
-      .get(`/restaurantes/by-dominio/${dominio}`)
+      .get<RestauranteResponseDTO>(`/restaurantes/by-dominio/${dominio}`)
       .then((response) => response.data)
       .catch(() => null),
-  enabled: dominio.length >= 3,
+  enabled: (dominio && dominio.length >= 3) || false,
 }));
 
 export const createRestauranteMutation = createMutation({
@@ -21,7 +31,12 @@ export const createRestauranteMutation = createMutation({
     });
 
     return api
-      .post("/restaurantes", formData)
-      .then((response) => response.data);
+      .post<RestauranteResponseDTO>("/restaurantes", formData)
+      .then((response) => response.data)
+      .then((data) => {
+        restauranteByDominioQuery.params(data.dominio).invalidate();
+
+        return data;
+      });
   },
 });

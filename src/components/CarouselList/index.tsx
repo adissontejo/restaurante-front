@@ -1,12 +1,14 @@
-import React, { useRef } from 'react';
-import { Box, Button, Grid } from '@mui/material';
-import { restaurantes } from '../../data';
-import { CardCarousel } from '../CardCarousel';
-import { theme } from '../../styles/theme';
+import React, { useRef } from "react";
+import { Box, Button, Grid } from "@mui/material";
+import { CardCarousel } from "../CardCarousel";
+import { theme } from "../../styles/theme";
+import { restaurantesQuery } from "../../services/api/restaurantes";
 
 interface CarouselListProps {}
 
 export const CarouselList: React.FC<CarouselListProps> = () => {
+  const { data: restaurantes } = restaurantesQuery.use();
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleScrollRight = () => {
@@ -22,16 +24,16 @@ export const CarouselList: React.FC<CarouselListProps> = () => {
   };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%' }}>
+    <Box sx={{ position: "relative", width: "100%" }}>
       <Box
         sx={{
-          overflowX: 'auto',
-          whiteSpace: 'nowrap',
-          width: '100%',
-          padding: '0 16px',
-          scrollbarWidth: 'none', // Firefox
-          '&::-webkit-scrollbar': {
-            display: 'none', // Chrome, Safari, and Opera
+          overflowX: "auto",
+          whiteSpace: "nowrap",
+          width: "100%",
+          padding: "0 16px",
+          scrollbarWidth: "none", // Firefox
+          "&::-webkit-scrollbar": {
+            display: "none", // Chrome, Safari, and Opera
           },
         }}
         ref={containerRef}
@@ -39,15 +41,15 @@ export const CarouselList: React.FC<CarouselListProps> = () => {
         <Grid
           container
           sx={{
-            display: 'flex',
-            flexWrap: 'nowrap',
+            display: "flex",
+            flexWrap: "nowrap",
           }}
         >
-          {restaurantes.map((restaurante) => (
+          {restaurantes?.map((restaurante) => (
             <Grid
               item
               key={restaurante.id}
-              sx={{ display: 'inline-block', minWidth: 300, flex: '0 0 auto' }}
+              sx={{ display: "inline-block", minWidth: 300, flex: "0 0 auto" }}
               mr={24}
             >
               <CardCarousel restaurante={restaurante} />
@@ -56,13 +58,13 @@ export const CarouselList: React.FC<CarouselListProps> = () => {
         </Grid>
       </Box>
       <Button
-        variant='contained'
+        variant="contained"
         onClick={handleScrollLeft}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           left: 0,
-          top: '50%',
-          transform: 'translateY(-50%)',
+          top: "50%",
+          transform: "translateY(-50%)",
           zIndex: 1,
           background: theme.colors.brown[300],
         }}
@@ -70,13 +72,13 @@ export const CarouselList: React.FC<CarouselListProps> = () => {
         &lt;
       </Button>
       <Button
-        variant='contained'
+        variant="contained"
         onClick={handleScrollRight}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           right: 0,
-          top: '50%',
-          transform: 'translateY(-50%)',
+          top: "50%",
+          transform: "translateY(-50%)",
           zIndex: 1,
           background: theme.colors.brown[300],
         }}

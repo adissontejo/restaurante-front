@@ -50,10 +50,9 @@ export const StepConnector = styled.div`
 `;
 
 export const Body = styled.div`
-    padding: 75px 73px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 56px;
-    margin-left: 200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  margin-left: 204px;
 `;

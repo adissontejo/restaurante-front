@@ -3,7 +3,6 @@ import { AddressFormData } from "./AddressStep";
 import { CoupounsFormData } from "./CouponsStep";
 import { ExhibitionFormData } from "./ExhibitionStep";
 import {
-  WeekDays,
   addressFormSchema,
   couponsFormSchema,
   exhibitionFormSchema,
@@ -13,8 +12,10 @@ import { toast } from "react-toastify";
 import { SchedulesFormData } from "./SchedulesStep";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Horario } from "./SchedulesStep/SchedulePicker/ModalForm";
-import { format } from "date-fns";
 import { createRestauranteMutation } from "../../services/api/restaurantes";
+import { useNavigate } from "react-router-dom";
+import { WeekDays } from "../../constants";
+import { formatTime } from "../../utils";
 
 export type Section = (typeof sections)[number]["key"];
 
@@ -29,6 +30,8 @@ export const useForms = ({
   onBack,
   onForward,
 }: UseFormsProps) => {
+  const navigate = useNavigate();
+
   const createRestaurante = createRestauranteMutation.use();
 
   const exhibitionForm = useForm<ExhibitionFormData>({
@@ -109,8 +112,8 @@ export const useForms = ({
       const horarios = WeekDays.flatMap((item) => {
         return schedulesData[item.value].map((horario) => {
           return {
-            abertura: format(horario.abertura, "hh:mm"),
-            fechamento: format(horario.fechamento, "hh:mm"),
+            abertura: formatTime(horario.abertura),
+            fechamento: formatTime(horario.fechamento),
             diaSemana: item.value,
           };
         });
@@ -120,6 +123,7 @@ export const useForms = ({
         {
           nome: exhibitionData.nome,
           dominio: exhibitionData.dominio,
+          descricao: exhibitionData.descricao,
           logo: exhibitionData.logo,
           cep: addressData.cep.replace(/\D/g, ""),
           complemento: addressData.complemento,
@@ -130,6 +134,9 @@ export const useForms = ({
           valorFidelidade: couponsData.valorFidelidade,
         },
         {
+          onSuccess(data) {
+            navigate(`/restaurante/${data.dominio}`);
+          },
           onError() {
             toast.error("Erro ao criar restaurante");
           },

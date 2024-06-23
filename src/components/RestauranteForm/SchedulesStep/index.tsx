@@ -1,9 +1,9 @@
 import { UseFormReturn } from "react-hook-form";
-import { DiaSemana } from "../../../services/api/dtos/horario-restaurante";
 import { SchedulePicker } from "./SchedulePicker";
-import { WeekDays } from "../constants";
 import { Container } from "./styles";
 import { Horario } from "./SchedulePicker/ModalForm";
+import { WeekDays } from "../../../constants";
+import { DiaSemana } from "../../../services/api/dtos/create-horario-restaurante.dto";
 
 export interface SchedulesFormData extends Record<DiaSemana, Horario[]> {}
 
