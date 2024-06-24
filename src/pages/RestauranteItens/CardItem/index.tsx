@@ -5,20 +5,37 @@ import {
   Dialog,
   Typography,
 } from "@mui/material";
-import { CardItemDiv, CardWrapper, IconContainer, IconDiv } from "./styles";
+import {
+  Button,
+  ButtonLabel,
+  Buttons,
+  CardItemDiv,
+  CardWrapper,
+  IconContainer,
+  IconDiv,
+} from "./styles";
 import React, { useState } from "react";
 import Plus from "../../../assets/plus.svg?react";
+import Pencil from "../../../assets/pencil.svg?react";
 import { DialogAddItem } from "../DialogAddItem";
 import { theme } from "../../../styles/theme";
 import { CategoriaResponseDTO } from "../../../services/api/dtos/categoria-response.dto";
+import { DialogItemForm } from "../DialogItemForm";
 
 interface CardItemProps {
   item: CategoriaResponseDTO["itens"][number];
+  categoriaId: number;
+  admin?: boolean;
 }
 
-export const CardItem: React.FC<CardItemProps> = ({ item }) => {
+export const CardItem: React.FC<CardItemProps> = ({
+  item,
+  admin,
+  categoriaId,
+}) => {
   const [hovered, setHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const handleToogleModal = () => {
     setShowModal(!showModal);
@@ -47,11 +64,20 @@ export const CardItem: React.FC<CardItemProps> = ({ item }) => {
             />
             <IconContainer
               style={{ opacity: hovered ? 1 : 0 }}
-              onClick={handleToogleModal}
+              onClick={admin ? undefined : handleToogleModal}
             >
-              <IconDiv>
-                <Plus height={25} width={25} />
-              </IconDiv>
+              {admin ? (
+                <Buttons>
+                  <Button variant="regular" onClick={() => setEditOpen(true)}>
+                    <Pencil />
+                    <ButtonLabel>Editar</ButtonLabel>
+                  </Button>
+                </Buttons>
+              ) : (
+                <IconDiv>
+                  <Plus height={25} width={25} />
+                </IconDiv>
+              )}
             </IconContainer>
           </Card>
         </CardWrapper>
@@ -73,6 +99,13 @@ export const CardItem: React.FC<CardItemProps> = ({ item }) => {
 
       <Dialog open={showModal}>
         <DialogAddItem item={item} handleClose={handleToogleModal} />
+      </Dialog>
+      <Dialog open={editOpen}>
+        <DialogItemForm
+          item={item}
+          handleClose={() => setEditOpen(false)}
+          categoriaId={categoriaId}
+        />
       </Dialog>
     </>
   );

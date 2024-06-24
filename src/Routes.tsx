@@ -9,13 +9,11 @@ import { RestauranteContaMes } from "./pages/RestauranteContaMes";
 import { RestauranteContaCliente } from "./pages/RestauranteContaCliente";
 import { App } from "./App";
 import { RestauranteProvider } from "./contexts/Restaurante";
-import { SocketProvider } from "./contexts/Socket";
 import { RestauranteContaPedidos } from "./pages/RestauranteContaPedidos";
 import { RestaurantePedidos } from "./pages/RestaurantePedidos";
 import { HomeRestaurants } from "./pages/HomeRestaurants";
 import { RestauranteAdminHome } from "./pages/RestauranteAdminHome";
 import { EditRestaurante } from "./pages/EditRestaurante";
-import { ManageCardapioRestaurante } from "./pages/ManageCardapioRestaurante";
 
 const router = createBrowserRouter([
   {
@@ -91,7 +89,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "cardapio",
-                element: <ManageCardapioRestaurante />,
+                element: <RestauranteItens admin />,
               },
             ],
           },

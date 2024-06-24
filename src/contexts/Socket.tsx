@@ -8,6 +8,7 @@ import { PedidoResponseDTO } from "../services/api/dtos/pedido-response.dto";
 import { StatusItemPedido } from "../services/api/dtos/item-pedido-response.dto";
 import { toast } from "react-toastify";
 import { FuncionarioResponseDTO } from "../services/api/dtos/funcionario-response.dto";
+import { getCupomsQuery } from "../services/api/cupons";
 
 export interface SocketContextData {
   createPedido: (pedido: CreatePedidoDTO) => Promise<PedidoResponseDTO>;
@@ -103,6 +104,7 @@ export const SocketProvider = ({
 
       socket?.once("create_response", (data: PedidoResponseDTO) => {
         pedidoCreated(data);
+        getCupomsQuery.params(usuario?.id || 0, restaurante.id).invalidate();
         resolve(data);
         if (!usuario) {
           unloggedIds.push(data.id);

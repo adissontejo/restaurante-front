@@ -20,6 +20,9 @@ export const calculaTotalPedido = (pedido: PedidoResponseDTO) => {
     const subtotal = item.instanciaItem.preco * item.quantidade;
     valorTotal += subtotal;
   });
+  if (pedido.cupom) {
+    valorTotal = Math.max(valorTotal - pedido.cupom.desconto, 0);
+  }
   return valorTotal;
 };
 

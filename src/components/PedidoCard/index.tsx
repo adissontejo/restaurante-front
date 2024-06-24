@@ -212,12 +212,26 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
                   >
                     {itemPedido.instanciaItem.item.nome}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    style={{ color: theme.colors.black[400] }}
-                  >
-                    {itemPedido.observacao}
-                  </Typography>
+                  {itemPedido.observacao?.length && (
+                    <Typography
+                      variant="body2"
+                      style={{ color: theme.colors.black[400] }}
+                    >
+                      {itemPedido.observacao}
+                    </Typography>
+                  )}
+                  {itemPedido.respostas?.map((resposta) =>
+                    resposta.resposta?.length || resposta.opcoes?.length ? (
+                      <Typography
+                        variant="body2"
+                        style={{ color: theme.colors.black[400] }}
+                      >
+                        {resposta.campoFormulario.nome}:{" "}
+                        {resposta.resposta ||
+                          resposta.opcoes?.map((opcao) => opcao.opcao.texto)}
+                      </Typography>
+                    ) : null
+                  )}
                 </Box>
                 <VerticalLine />
                 <Typography

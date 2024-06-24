@@ -6,10 +6,12 @@ import { ItemResponseDTO } from "../services/api/dtos/item-response.dto";
 import { useAuth } from "../hooks/useAuth";
 import { funcionarioQuery } from "../services/api/funcionario";
 import { FuncionarioResponseDTO } from "../services/api/dtos/funcionario-response.dto";
+import { CreateItemPedidoDTO } from "../services/api/dtos/create-item-pedido.dto";
 
 interface ItemCarrinho extends ItemResponseDTO {
   quantidade: number;
   observacao?: string;
+  respostas?: CreateItemPedidoDTO["respostas"];
 }
 
 export interface RestauranteContextData {

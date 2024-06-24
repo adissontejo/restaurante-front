@@ -1,6 +1,7 @@
 export enum TipoCampo {
   INPUT = "input",
   SELECT = "select",
+  MULTISELECT = "multiselect",
 }
 
 export interface CreateCampoFormularioDTO {
@@ -9,4 +10,5 @@ export interface CreateCampoFormularioDTO {
   qtMinOpcoes?: number;
   qtMaxOpcoes?: number;
   opcoes: string[];
+  obrigatorio: boolean;
 }

@@ -1,21 +1,25 @@
 import React from "react";
 import {
+  Autocomplete,
   Box,
   Button,
   DialogContent,
   DialogTitle,
+  TextField,
   Typography,
 } from "@mui/material";
 import { BoxImage, BoxTitle, ButtonsWrapper } from "./styles";
 import CrossSmall from "../../../assets/cross-small.svg?react";
 import { theme } from "../../../styles/theme";
 import { CategoriaResponseDTO } from "../../../services/api/dtos/categoria-response.dto";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { ControlledFormField } from "../../../components/Form";
 import { useRestaurante } from "../../../hooks/useRestaurante";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema } from "./constants";
 import { toast } from "react-toastify";
+import { TipoCampo } from "../../../services/api/dtos/create-campo-formulario.dto";
+import { CampoFormularioResponseDTO } from "../../../services/api/dtos/campo-formluario-response.dto";
 
 interface DialogAddItemProps {
   item: CategoriaResponseDTO["itens"][number];
@@ -25,6 +29,10 @@ interface DialogAddItemProps {
 interface FormData {
   quantidade: number;
   observacao: string;
+  respostas: {
+    opcoesIds: number[];
+    resposta: string;
+  }[];
 }
 
 export const DialogAddItem: React.FC<DialogAddItemProps> = ({
@@ -36,8 +44,11 @@ export const DialogAddItem: React.FC<DialogAddItemProps> = ({
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: {
       quantidade: 1,
+      respostas: item.campos.map(() => ({
+        opcoesIds: [],
+      })),
     },
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema(item)),
     mode: "onTouched",
   });
 
@@ -48,9 +59,43 @@ export const DialogAddItem: React.FC<DialogAddItemProps> = ({
       ...item,
       observacao: data.observacao,
       quantidade: data.quantidade,
+      respostas: data.respostas?.map((resposta, index) => ({
+        campoFormularioId: item.campos[index].id,
+        opcoesIds: resposta.opcoesIds,
+        resposta: resposta.resposta,
+      })),
     });
     toast.success("Item adicionado ao carrinho!");
     handleClose();
+  };
+
+  const formatNome = (campo: CampoFormularioResponseDTO) => {
+    if (campo.tipoCampo !== TipoCampo.MULTISELECT) {
+      return campo.nome;
+    }
+
+    const qtMinOpcoes = Math.max(
+      campo.qtMinOpcoes || 0,
+      campo.obrigatorio ? 1 : 0
+    );
+
+    if (qtMinOpcoes && campo.qtMaxOpcoes) {
+      if (qtMinOpcoes === campo.qtMaxOpcoes) {
+        return `${campo.nome} (escolha ${qtMinOpcoes})`;
+      }
+
+      return `${campo.nome} (de ${qtMinOpcoes} à ${campo.qtMaxOpcoes})`;
+    }
+
+    if (qtMinOpcoes) {
+      return `${campo.nome} (${qtMinOpcoes} ou mais)`;
+    }
+
+    if (campo.qtMaxOpcoes) {
+      return `${campo.nome} (até ${campo.qtMaxOpcoes})`;
+    }
+
+    return campo.nome;
   };
 
   return (
@@ -105,17 +150,57 @@ export const DialogAddItem: React.FC<DialogAddItemProps> = ({
           fullWidth
           sx={{ marginY: 1 }}
         />
-        <BoxTitle>
-          <Typography
-            variant="subtitle1"
-            sx={{ color: theme.colors.black[500] }}
-          >
-            Escolha os Acompanhamentos
-          </Typography>
-          <Typography variant="body2" sx={{ color: theme.colors.black[300] }}>
-            Máximo: 4
-          </Typography>
-        </BoxTitle>
+        {item.campos?.map((campo, index) =>
+          campo.tipoCampo === TipoCampo.INPUT ? (
+            <ControlledFormField
+              control={control}
+              name={`respostas.${index}.resposta`}
+              label={campo.nome}
+              fullWidth
+              sx={{ marginY: 1 }}
+              required={campo.obrigatorio}
+            />
+          ) : (
+            <Controller
+              control={control}
+              name={`respostas.${index}.opcoesIds`}
+              render={({ field, fieldState }) => (
+                <Autocomplete
+                  fullWidth
+                  freeSolo
+                  multiple={campo.tipoCampo === TipoCampo.MULTISELECT}
+                  options={campo.opcoes?.map((opcao) => opcao.id) || []}
+                  getOptionLabel={(value) =>
+                    campo.opcoes?.find((opcao) => opcao.id === value)?.texto ||
+                    ""
+                  }
+                  sx={{ marginY: 1 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={formatNome(campo)}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                    />
+                  )}
+                  {...field}
+                  value={
+                    campo.tipoCampo === TipoCampo.MULTISELECT
+                      ? field.value
+                      : field.value[0]
+                  }
+                  onChange={(_, value) => {
+                    if (campo.tipoCampo === TipoCampo.MULTISELECT) {
+                      field.onChange(value);
+                    } else {
+                      field.onChange(value ? [value] : []);
+                    }
+                  }}
+                ></Autocomplete>
+              )}
+            />
+          )
+        )}
         <ButtonsWrapper>
           <Button
             variant="contained"

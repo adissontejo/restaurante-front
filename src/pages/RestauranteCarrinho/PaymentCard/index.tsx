@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Typography,
   Box,
@@ -8,7 +8,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  SelectChangeEvent,
 } from "@mui/material";
 import { BoxContent, BoxHeader } from "./styles";
 import { theme } from "../../../styles/theme";
@@ -16,32 +15,33 @@ import { useSocket } from "../../../hooks/useSocket";
 import { useRestaurante } from "../../../hooks/useRestaurante";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getCupomsQuery } from "../../../services/api/cupons";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface PaymentCardProps {}
 
 export const PaymentCard: React.FC<PaymentCardProps> = () => {
   const { createPedido } = useSocket();
+  const { usuario } = useAuth();
   const { restaurante, itensCarrinho, totalPedido, emptyCart } =
     useRestaurante();
 
   const navigate = useNavigate();
   const { dominio } = useParams();
 
-  const [selectedCoupon, setSelectedCoupon] = useState<string>("");
-  const [discount, setDiscount] = useState<number>(0);
+  const { data: cupons } = getCupomsQuery
+    .options({ enabled: !!usuario })
+    .params(usuario?.id || 0, restaurante.id)
+    .use();
 
-  const handleCouponChange = (event: SelectChangeEvent) => {
-    setSelectedCoupon(event.target.value);
-  };
+  const [selectedCoupon, setSelectedCoupon] = useState<number>();
+  const [appliedCoupon, setAppliedCoupon] = useState<number>();
 
-  const handleApplyCoupon = () => {
-    if (selectedCoupon === "CUPOM10") setDiscount(0.1);
-    if (selectedCoupon === "CUPOM20") setDiscount(0.2);
-    if (selectedCoupon === "CUPOM30") setDiscount(0.3);
-    if (selectedCoupon === "") setDiscount(0);
-
-    console.log(`Coupon applied: ${selectedCoupon}`);
-  };
+  const discount = useMemo(() => {
+    if (appliedCoupon) {
+      return cupons?.find((item) => item.id === appliedCoupon)?.desconto;
+    }
+  }, [appliedCoupon]);
 
   const handleConfirm = async () => {
     if (!itensCarrinho.length) {
@@ -56,7 +56,9 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
         instanciaItemId: item.instanciaAtiva.id,
         observacao: item.observacao,
         quantidade: item.quantidade,
+        respostas: item.respostas,
       })),
+      cupomId: selectedCoupon,
     });
     toast.success("Pedido criado com sucesso!");
 
@@ -82,28 +84,28 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
             labelId="select-coupon-label"
             id="select-coupon"
             value={selectedCoupon}
+            onChange={(e) => setSelectedCoupon(e.target.value as any)}
             label="Selecione o Cupom"
-            onChange={handleCouponChange}
             sx={{ background: theme.colors.beige[300] }}
           >
-            <MenuItem value="" sx={{ color: theme.colors.black[300] }}>
-              Nenhum
-            </MenuItem>
-            <MenuItem value="CUPOM10" sx={{ color: theme.colors.black[400] }}>
-              CUPOM10 - 10% off
-            </MenuItem>
-            <MenuItem value="CUPOM20" sx={{ color: theme.colors.black[400] }}>
-              CUPOM20 - 20% off
-            </MenuItem>
-            <MenuItem value="CUPOM30" sx={{ color: theme.colors.black[400] }}>
-              CUPOM30 - 30% off
-            </MenuItem>
+            <MenuItem value={undefined}>Nenhum</MenuItem>
+            {cupons?.map((cupom) => (
+              <MenuItem
+                key={cupom.id}
+                value={cupom.id}
+                sx={{ color: theme.colors.black[300] }}
+                disabled={cupom.qtPedidosFeitos < cupom.qtPedidosTotal}
+              >
+                Cupom Fidelidade - {cupom.qtPedidosFeitos} de{" "}
+                {cupom.qtPedidosTotal}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <Button
           variant="contained"
           fullWidth
-          onClick={handleApplyCoupon}
+          onClick={() => setAppliedCoupon(selectedCoupon)}
           style={{ background: theme.colors.black[600] }}
         >
           Aplicar
@@ -133,7 +135,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
             R$ {totalPedido}
           </Typography>
         </Box>
-        {discount !== 0 ? (
+        {discount ? (
           <>
             <Box
               display="flex"
@@ -151,7 +153,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
                 variant="body1"
                 style={{ color: theme.colors.green[500] }}
               >
-                - R$ {discount * totalPedido}
+                - R$ {discount}
               </Typography>
             </Box>
             <Box
@@ -171,7 +173,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
                 fontWeight="bold"
                 style={{ color: theme.colors.black[500] }}
               >
-                R$ {(1 - discount) * totalPedido}
+                R$ {Math.max(totalPedido - (discount || 0), 0)}
               </Typography>
             </Box>
           </>

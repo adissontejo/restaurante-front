@@ -36,7 +36,7 @@ export const PedidosList = ({ admin, status = "todos" }: PedidosListProps) => {
 
   return (
     <BoxList>
-      {pedidosFiltered.map((order, index) => (
+      {pedidosFiltered.map((order) => (
         <PedidoCard admin={admin} pedido={order} key={order.id} />
       ))}
     </BoxList>
