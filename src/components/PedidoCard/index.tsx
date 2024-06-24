@@ -151,7 +151,7 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
               variant="h6"
               style={{ color: theme.colors.black[500], fontWeight: 800 }}
             >
-              R$ {valorTotal.toFixed(2)}
+              Mesa {pedido.numeroMesa} - R$ {valorTotal.toFixed(2)}
             </Typography>
             <VerticalLine />
             <Typography

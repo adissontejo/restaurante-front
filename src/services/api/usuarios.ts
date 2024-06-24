@@ -28,3 +28,12 @@ export const updateUsuarioMutation = createMutation({
       });
   },
 });
+
+export const getUsuarioByEmailQuery = createQuery((email: string) => ({
+  queryKey: ["usuario", "by-email", email],
+  queryFn: () =>
+    api
+      .get<UsuarioResponseDTO>(`/usuarios/by-email/${email}`)
+      .then((response) => response.data)
+      .catch(() => null),
+}));

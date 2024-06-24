@@ -1,84 +1,89 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardMedia, Dialog, Typography } from "@mui/material";
-import { CardItemDiv, CardWrapper, IconContainer, IconDiv } from "./styles";
-import Plus from "../../../assets/plus.svg?react";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  Dialog,
+  Typography,
+} from "@mui/material";
+import { EditButton, EditLabel, VerticalLine } from "./styles";
+import Pencil from "../../../assets/pencil.svg?react";
 import { theme } from "../../../styles/theme";
 import { FuncionarioResponseDTO } from "../../../services/api/dtos/funcionario-response.dto";
+import { cargos } from "../../../constants";
+import { DialogFuncionarioForm } from "../DialogFuncionarioForm";
+import { Cargo } from "../../../services/api/dtos/create-funcionario.dto";
+import { useRestaurante } from "../../../hooks/useRestaurante";
 
 interface CardFuncProps {
   funcionario: FuncionarioResponseDTO;
 }
 
 export const CardFunc: React.FC<CardFuncProps> = ({ funcionario }) => {
-  const [hovered, setHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const handleToogleModal = () => {
-    setShowModal(!showModal);
-  };
+  const { funcionarioLogado } = useRestaurante();
 
   return (
-    <>
-      <CardItemDiv>
-        <CardWrapper
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-        >
-          <Card
-            variant="elevation"
-            style={{
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-              borderRadius: "24px",
-            }}
+    <Box style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <Card sx={{ borderRadius: "24px", padding: "8px 24px", boxShadow: 3 }}>
+        <CardContent>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            width="100%"
+            alignItems="center"
           >
-            <CardMedia
-              component="div"
-              style={{ height: "100%", width: "100%", backgroundColor: theme.colors.brown[50], display: "flex", alignItems: "center", justifyContent: "center" }}
+            <Avatar src={funcionario.usuario.fotoPerfilUrl || undefined} />
+            <Typography
+              variant="h6"
+              style={{ color: theme.colors.black[500], fontWeight: 800 }}
             >
-              <Typography variant="h4" color={theme.colors.black[400]}>
-                {funcionario.cargo}
-              </Typography>
-            </CardMedia>
-            <IconContainer
-              style={{ opacity: hovered ? 1 : 0 }}
-              onClick={handleToogleModal}
+              {funcionario.usuario.nome}
+            </Typography>
+
+            <VerticalLine />
+            <Typography
+              variant="body1"
+              style={{
+                color: theme.colors.black[300],
+                fontWeight: 600,
+                textTransform: "uppercase",
+              }}
             >
-              <IconDiv>
-                <Plus height={25} width={25} />
-              </IconDiv>
-            </IconContainer>
-          </Card>
-        </CardWrapper>
-        <CardContent style={{ padding: 0 }}>
-          <Typography
-            variant="h5"
-            component="div"
-            color={theme.colors.black[600]}
-            fontWeight={800}
-          >
-            {funcionario.usuario.nome}
-          </Typography>
-          <Typography variant="body1" color={theme.colors.black[400]}>
-            Restaurante ID: {funcionario.restauranteId}
-          </Typography>
+              {cargos.find((item) => item.value === funcionario.cargo)?.label}
+            </Typography>
+            <EditButton
+              onClick={
+                funcionario.cargo === Cargo.DONO
+                  ? undefined
+                  : () => setShowModal(true)
+              }
+              style={{
+                opacity:
+                  funcionario.cargo !== Cargo.DONO &&
+                  (funcionarioLogado?.cargo === Cargo.DONO ||
+                    (funcionarioLogado?.cargo === Cargo.ADMIN &&
+                      funcionario.cargo !== Cargo.ADMIN))
+                    ? 1
+                    : 0,
+                cursor:
+                  funcionario.cargo === Cargo.DONO ? "initial" : "pointer",
+              }}
+            >
+              <Pencil />
+              <EditLabel>Editar</EditLabel>
+            </EditButton>
+          </Box>
         </CardContent>
-      </CardItemDiv>
-      <Dialog open={showModal} onClose={handleToogleModal}>
-        <Typography variant="h6" component="div" style={{ padding: '16px' }}>
-          Detalhes do Funcionário
-        </Typography>
-        <Typography variant="body1" component="div" style={{ padding: '16px' }}>
-          Cargo: {funcionario.cargo}
-        </Typography>
-        <Typography variant="body1" component="div" style={{ padding: '16px' }}>
-          Usuário: {funcionario.usuario.nome}
-        </Typography>
-        <Typography variant="body1" component="div" style={{ padding: '16px' }}>
-          Restaurante ID: {funcionario.restauranteId}
-        </Typography>
+      </Card>
+      <Dialog open={showModal}>
+        <DialogFuncionarioForm
+          funcionario={funcionario}
+          handleClose={() => setShowModal(false)}
+        />
       </Dialog>
-    </>
+    </Box>
   );
 };
