@@ -26,10 +26,6 @@ export const MenuItem = ({ path, icon: Icon, admin }: MenuItemProps) => {
 
     const active = base.match(regex)?.[2];
 
-    if (path === "historico") {
-      return !!active?.startsWith("historico");
-    }
-
     return active === path;
   }, [dominio, pathname]);
 
@@ -37,9 +33,7 @@ export const MenuItem = ({ path, icon: Icon, admin }: MenuItemProps) => {
     <CardActionArea
       onClick={() =>
         navigate(
-          `/restaurante/${restaurante.dominio}${admin ? "/admin" : ""}/${
-            path === "historico" ? "historico/conta" : path
-          }`
+          `/restaurante/${restaurante.dominio}${admin ? "/admin" : ""}/${path}`
         )
       }
     >

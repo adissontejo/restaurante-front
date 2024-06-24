@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Typography, IconButton, Box, Collapse } from "@mui/material";
 import { CountButton, ItemContainer, ItemImage, BoxNumber } from "./styles";
 import Plus from "../../../assets/plus.svg?react";
@@ -24,6 +24,28 @@ export const ItemCart: React.FC<ItemCartProps> = ({ index }) => {
     setShowDetails(!showDetails);
     setIconRotation(showDetails ? 0 : 180);
   };
+
+  const respostas = useMemo(() => {
+    return item.respostas
+      ?.filter((resposta) => resposta.opcoesIds?.length || resposta.resposta)
+      .map((resposta) => {
+        const campo = item.campos?.find(
+          (campo) => campo.id === resposta.campoFormularioId
+        );
+
+        if (resposta.resposta) {
+          return `${campo?.nome}: ${resposta.resposta}`;
+        }
+
+        return resposta.opcoesIds
+          ?.map((opcaoId) => {
+            const opcao = campo?.opcoes?.find((opcao) => opcao.id === opcaoId);
+
+            return `${campo?.nome}: ${opcao?.texto}`;
+          })
+          .join(", ");
+      });
+  }, [item]);
 
   return (
     <>
@@ -88,17 +110,30 @@ export const ItemCart: React.FC<ItemCartProps> = ({ index }) => {
         unmountOnExit
         style={{ padding: "0px 16px" }}
       >
-        <Typography
-          variant="body2"
-          style={{
-            color: theme.colors.black[400],
-            borderTop: "1px solid " + theme.colors.beige[600],
-            padding: "8px 0",
-          }}
-        >
-          {" "}
-          {item.observacao}{" "}
-        </Typography>
+        {item.observacao?.length ? (
+          <Typography
+            variant="body2"
+            style={{
+              color: theme.colors.black[400],
+              borderTop: "1px solid " + theme.colors.beige[600],
+              padding: "8px 0",
+            }}
+          >
+            Observação: {item.observacao}
+          </Typography>
+        ) : null}
+        {respostas?.length ? (
+          <Typography
+            variant="body2"
+            style={{
+              color: theme.colors.black[400],
+              borderTop: "1px solid " + theme.colors.beige[600],
+              padding: "8px 0",
+            }}
+          >
+            {respostas}
+          </Typography>
+        ) : null}
       </Collapse>
     </>
   );

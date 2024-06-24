@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { PedidoResponseDTO } from "./services/api/dtos/pedido-response.dto";
+import { ItemResponseDTO } from "./services/api/dtos/item-response.dto";
 
 export const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -8,6 +9,16 @@ export const formatDate = (date: Date) => {
     day: "numeric",
   };
   return new Date(date).toLocaleDateString(undefined, options);
+};
+
+export const getCategorias = (itens: ItemResponseDTO[]): string[] => {
+  return Array.from(
+    itens.reduce((acc, curr) => {
+      acc.add(curr.categoria);
+
+      return acc;
+    }, new Set<string>())
+  );
 };
 
 export const formatTime = (date: Date) => {
@@ -20,6 +31,9 @@ export const calculaTotalPedido = (pedido: PedidoResponseDTO) => {
     const subtotal = item.instanciaItem.preco * item.quantidade;
     valorTotal += subtotal;
   });
+  if (pedido.cupom) {
+    valorTotal = Math.max(valorTotal - pedido.cupom.desconto, 0);
+  }
   return valorTotal;
 };
 

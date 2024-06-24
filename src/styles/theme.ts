@@ -35,6 +35,7 @@ export const theme = {
       600: "#181818",
     },
     red: {
+      100: "#E4BFBC",
       400: "#BA5B51",
     },
     green: {

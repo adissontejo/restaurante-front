@@ -3,13 +3,18 @@ import { Typography, Stack } from "@mui/material";
 import { Line } from "./styles";
 import { theme } from "../../styles/theme";
 import { LoginButton } from "../LoginButton";
+import { Button } from "../Button";
 
 interface TitleWithUnderlineProps {
   text: string;
+  buttonText?: string;
+  buttonAction?: () => void;
 }
 
 export const TitleWithUnderline: React.FC<TitleWithUnderlineProps> = ({
   text,
+  buttonText,
+  buttonAction,
 }) => {
   return (
     <Stack direction="row" justifyContent="space-between">
@@ -26,7 +31,14 @@ export const TitleWithUnderline: React.FC<TitleWithUnderlineProps> = ({
         {text}
         <Line />
       </Typography>
-      <LoginButton>Logar com o Google</LoginButton>
+      {!buttonText && !buttonAction && (
+        <LoginButton>Logar com o Google</LoginButton>
+      )}
+      {(buttonText || buttonAction) && (
+        <Button onClick={buttonAction} variant="dark">
+          {buttonText}
+        </Button>
+      )}
     </Stack>
   );
 };

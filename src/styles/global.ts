@@ -16,4 +16,8 @@ export const GlobalStyles = createGlobalStyle`
     border: none;
     cursor: pointer;
   }
+
+  :root {
+    --toastify-toast-width: 480px;
+  }
 `;

@@ -5,18 +5,16 @@ import { RestauranteHome } from "./pages/RestauranteHome";
 import { AppContainer } from "./components/AppContainer";
 import { RestauranteItens } from "./pages/RestauranteItens";
 import { RestauranteCarrinho } from "./pages/RestauranteCarrinho";
-import { RestauranteContaMes } from "./pages/RestauranteContaMes";
 import { RestauranteContaCliente } from "./pages/RestauranteContaCliente";
 import { App } from "./App";
 import { RestauranteProvider } from "./contexts/Restaurante";
-import { SocketProvider } from "./contexts/Socket";
-import { RestauranteContaPedidos } from "./pages/RestauranteContaPedidos";
 import { RestaurantePedidos } from "./pages/RestaurantePedidos";
 import { HomeRestaurants } from "./pages/HomeRestaurants";
 import { RestauranteAdminHome } from "./pages/RestauranteAdminHome";
 import { EditRestaurante } from "./pages/EditRestaurante";
 import { ManageCardapioRestaurante } from "./pages/ManageCardapioRestaurante";
 import { Login } from "./pages/Login";
+
 
 const router = createBrowserRouter([
   {
@@ -63,18 +61,8 @@ const router = createBrowserRouter([
                 element: <RestauranteCarrinho />,
               },
               {
-                path: "historico",
-                element: <RestauranteContaPedidos />,
-                children: [
-                  {
-                    path: "conta",
-                    element: <RestauranteContaMes />,
-                  },
-                  {
-                    path: "pedidos",
-                    element: <RestaurantePedidos />,
-                  },
-                ],
+                path: "pedidos",
+                element: <RestaurantePedidos />,
               },
               {
                 path: "conta",
@@ -96,7 +84,11 @@ const router = createBrowserRouter([
               },
               {
                 path: "cardapio",
-                element: <ManageCardapioRestaurante />,
+                element: <RestauranteItens admin />,
+              },
+              {
+                path: "conta",
+                element: <RestauranteContaCliente />,
               },
             ],
           },

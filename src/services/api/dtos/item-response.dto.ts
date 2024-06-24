@@ -8,6 +8,7 @@ export interface ItemResponseDTO {
   campos: CampoFormularioResponseDTO[];
   instanciaAtiva: InstanciaItemResponseDTO;
   fotoUrl: string | null;
+  categoria: string;
 }
 
 export interface ItemResponseWithoutInstanciaDTO

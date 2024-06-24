@@ -42,7 +42,7 @@ interface PedidoCardProps {
 }
 
 export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
-  const { restaurante } = useRestaurante();
+  const { restaurante, funcionarioLogado } = useRestaurante();
   const { startPedido, cancelItem, finishItem, setFuncionarioResponsavel } =
     useSocket();
 
@@ -66,11 +66,10 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
           icon={admin ? Start : Pending}
           onClick={
             admin
-              ? async () => {
-                  await startPedido(pedido.id);
-
-                  toast.success("Pedido iniciado!");
-                }
+              ? () =>
+                  startPedido(pedido.id)
+                    .then(() => toast.success("Pedido iniciado!"))
+                    .catch(() => toast.error("Erro ao iniciar pedido"))
               : undefined
           }
         />
@@ -99,12 +98,26 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
       }
 
       if (item.status === StatusItemPedido.PREPARANDO) {
-        return admin ? (
+        return admin && funcionarioLogado?.cargo !== Cargo.GARCOM ? (
           <ItemButtons>
-            <ItemButton variant="cancel" onClick={() => cancelItem(item.id)}>
+            <ItemButton
+              variant="cancel"
+              onClick={() =>
+                cancelItem(item.id).catch(() =>
+                  toast.error("Erro ao cancelar item")
+                )
+              }
+            >
               <Cancel />
             </ItemButton>
-            <ItemButton variant="confirm" onClick={() => finishItem(item.id)}>
+            <ItemButton
+              variant="confirm"
+              onClick={() =>
+                finishItem(item.id).catch(() =>
+                  toast.error("Erro ao finalizar item")
+                )
+              }
+            >
               <Check />
             </ItemButton>
           </ItemButtons>
@@ -155,33 +168,38 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
             >
               {format(pedido.dataHora, "dd/MM/yyyy HH:mm:ss")}
             </Typography>
-            <FormControl>
-              <InputLabel id="responsavel-label">Responsável</InputLabel>
-              <Select
-                labelId="responsavel-label"
-                label="Responsável"
-                sx={{ width: 180 }}
-                onClick={(e) => e.stopPropagation()}
-                defaultValue={pedido.funcionarioResponsavel?.id}
-                value={pedido.funcionarioResponsavel?.id}
-                onChange={(e) =>
-                  setFuncionarioResponsavel(
-                    pedido.id,
-                    e.target.value as number
-                  ).then(() =>
-                    toast.success("Responsável alterado com sucesso!")
-                  )
-                }
-              >
-                {funcionarios
-                  ?.filter((item) => item.cargo === Cargo.GARCOM)
-                  ?.map((funcionario) => (
-                    <MenuItem value={funcionario.id}>
-                      {funcionario.usuario.nome}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
+            {admin && (
+              <FormControl>
+                <InputLabel id="responsavel-label">Responsável</InputLabel>
+                <Select
+                  labelId="responsavel-label"
+                  label="Responsável"
+                  sx={{ width: 180 }}
+                  onClick={(e) => e.stopPropagation()}
+                  defaultValue={pedido.funcionarioResponsavel?.id}
+                  value={pedido.funcionarioResponsavel?.id}
+                  disabled={funcionarioLogado?.cargo === Cargo.GARCOM}
+                  onChange={(e) =>
+                    setFuncionarioResponsavel(
+                      pedido.id,
+                      e.target.value as number
+                    )
+                      .then(() =>
+                        toast.success("Responsável alterado com sucesso!")
+                      )
+                      .catch(() => toast.error("Erro ao alterar responsável"))
+                  }
+                >
+                  {funcionarios
+                    ?.filter((item) => item.cargo === Cargo.GARCOM)
+                    ?.map((funcionario) => (
+                      <MenuItem value={funcionario.id}>
+                        {funcionario.usuario.nome}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            )}
             {statusEl}
             <IconButton
               onClick={handleToggleDetails}
@@ -212,12 +230,26 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, admin }) => {
                   >
                     {itemPedido.instanciaItem.item.nome}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    style={{ color: theme.colors.black[400] }}
-                  >
-                    {itemPedido.observacao}
-                  </Typography>
+                  {itemPedido.observacao?.length && (
+                    <Typography
+                      variant="body2"
+                      style={{ color: theme.colors.black[400] }}
+                    >
+                      {itemPedido.observacao}
+                    </Typography>
+                  )}
+                  {itemPedido.respostas?.map((resposta) =>
+                    resposta.resposta?.length || resposta.opcoes?.length ? (
+                      <Typography
+                        variant="body2"
+                        style={{ color: theme.colors.black[400] }}
+                      >
+                        {resposta.campoFormulario.nome}:{" "}
+                        {resposta.resposta ||
+                          resposta.opcoes?.map((opcao) => opcao.opcao.texto)}
+                      </Typography>
+                    ) : null
+                  )}
                 </Box>
                 <VerticalLine />
                 <Typography
