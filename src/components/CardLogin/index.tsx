@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Box, Button, Card, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
 import { RestauranteResponseDTO } from "../../services/api/dtos/restaurante-response.dto";
 import { LoginButton } from "../LoginButton";
 import { ListTab } from "../ListTab";
@@ -14,20 +21,24 @@ interface CardLoginProps {
 
 export const CardLogin: React.FC<CardLoginProps> = ({ restaurante }) => {
   const { usuario } = useAuth();
-  const { restaurante: restauranteContext, funcionarioLogado } = useRestaurante();
+  const { funcionarioLogado } = useRestaurante();
 
-  const loginTypes = [{ label: 'Usuário', value: 'user' }, { label: 'Restaurante', value: 'funcionario' }];
+  const loginTypes = [
+    { label: "Usuário", value: "user" },
+    { label: "Restaurante", value: "funcionario" },
+  ];
 
-  const [loginType, setLoginType] = useState('user');
+  const [loginType, setLoginType] = useState("user");
   const navigate = useNavigate();
 
   const handleClickLogado = () => {
-    if (loginType === 'user') {
+    if (loginType === "user") {
       navigate(`/restaurante/${restaurante.dominio}/`);
-      toast.success(`Bem Vindo(a) ${usuario ? usuario.nome : ""}`);
+      toast.success(`Bem vindo(a), ${usuario ? usuario.nome : ""}`);
     } else {
-      if (funcionarioLogado && usuario && restauranteContext.dominio === restaurante.dominio && funcionarioLogado.id === usuario.id) {
-        navigate(`/restaurante/${restaurante.dominio}/`);
+      if (funcionarioLogado) {
+        toast.success(`Bem vindo(a), ${usuario ? usuario.nome : ""}`);
+        navigate(`/restaurante/${restaurante.dominio}/admin`);
       } else {
         toast.error("Você não tem permissão de funcionário!");
       }
@@ -41,16 +52,20 @@ export const CardLogin: React.FC<CardLoginProps> = ({ restaurante }) => {
   };
 
   const handleJump = () => {
-    if (loginType === 'user') {
+    if (loginType === "user") {
       navigate(`/restaurante/${restaurante.dominio}/`);
       toast.success("Logado como Visitante");
     } else {
-      toast.error("Apenas usuários logados podem logar como administradores de restaurante!");
+      toast.error(
+        "Apenas usuários logados podem logar como administradores de restaurante!"
+      );
     }
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <Box sx={{ height: "160px", width: "160px", zIndex: 1 }}>
         <CardMedia
           component="img"
@@ -76,9 +91,18 @@ export const CardLogin: React.FC<CardLoginProps> = ({ restaurante }) => {
         }}
       >
         <CardContent
-          sx={{ display: "flex", flexDirection: "column", gap: "40px", alignItems: "center" }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "40px",
+            alignItems: "center",
+          }}
         >
-          <ListTab items={loginTypes} onChange={setLoginType} value={loginType} />
+          <ListTab
+            items={loginTypes}
+            onChange={setLoginType}
+            value={loginType}
+          />
           {!usuario ? (
             <React.Fragment>
               <LoginButton />

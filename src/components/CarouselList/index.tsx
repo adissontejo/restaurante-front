@@ -5,14 +5,10 @@ import { theme } from "../../styles/theme";
 import { restaurantesQuery } from "../../services/api/restaurantes";
 import { RestauranteResponseDTO } from "../../services/api/dtos/restaurante-response.dto";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { useRestaurante } from "../../hooks/useRestaurante";
 
 interface CarouselListProps {}
 
 export const CarouselList: React.FC<CarouselListProps> = () => {
-    const { usuario } = useAuth();
-
   const { data: restaurantes } = restaurantesQuery.use();
   const navigate = useNavigate();
 
@@ -30,13 +26,12 @@ export const CarouselList: React.FC<CarouselListProps> = () => {
     }
   };
 
-  const handleRestaurantClick = (restauranteData : RestauranteResponseDTO) => {
-
-    navigate(`/login?restaurante=${restauranteData.dominio}`);
+  const handleRestaurantClick = (restauranteData: RestauranteResponseDTO) => {
+    navigate(`/restaurante/${restauranteData.dominio}/login`);
   };
 
   return (
-    <Box sx={{ position: "relative", width: "100%"  }}>
+    <Box sx={{ position: "relative", width: "100%" }}>
       <Box
         sx={{
           overflowX: "auto",
@@ -55,7 +50,7 @@ export const CarouselList: React.FC<CarouselListProps> = () => {
           sx={{
             display: "flex",
             flexWrap: "nowrap",
-            justifyContent: "center"
+            justifyContent: "center",
           }}
         >
           {restaurantes?.map((restauranteData) => (
@@ -65,11 +60,17 @@ export const CarouselList: React.FC<CarouselListProps> = () => {
               sx={{ display: "inline-block", minWidth: 300, flex: "0 0 auto" }}
               mr={24}
             >
-            <Button
+              <Button
                 variant="outlined"
                 onClick={() => handleRestaurantClick(restauranteData)}
-                sx={{ width: "100%", textAlign: "left", padding: 0, border: 'none', "&:hover": {  border: 'none' } }}
-            >
+                sx={{
+                  width: "100%",
+                  textAlign: "left",
+                  padding: 0,
+                  border: "none",
+                  "&:hover": { border: "none" },
+                }}
+              >
                 <CardCarousel restaurante={restauranteData} />
               </Button>
             </Grid>

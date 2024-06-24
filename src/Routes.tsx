@@ -12,9 +12,8 @@ import { RestaurantePedidos } from "./pages/RestaurantePedidos";
 import { HomeRestaurants } from "./pages/HomeRestaurants";
 import { RestauranteAdminHome } from "./pages/RestauranteAdminHome";
 import { EditRestaurante } from "./pages/EditRestaurante";
-import { ManageCardapioRestaurante } from "./pages/ManageCardapioRestaurante";
 import { Login } from "./pages/Login";
-
+import { RestauranteFuncionarios } from "./pages/RestauranteFuncionario";
 
 const router = createBrowserRouter([
   {
@@ -24,10 +23,6 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
       },
       {
         path: "/restaurantes",
@@ -45,6 +40,10 @@ const router = createBrowserRouter([
           </RestauranteProvider>
         ),
         children: [
+          {
+            path: "login",
+            element: <Login />,
+          },
           {
             element: <AppContainer />,
             children: [
@@ -89,6 +88,10 @@ const router = createBrowserRouter([
               {
                 path: "conta",
                 element: <RestauranteContaCliente />,
+              },
+              {
+                path: "funcionarios",
+                element: <RestauranteFuncionarios />,
               },
             ],
           },

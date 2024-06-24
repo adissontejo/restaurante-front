@@ -1,4 +1,3 @@
-import { useSearchParams } from "react-router-dom";
 import {
   BoxTitle,
   Container,
@@ -7,49 +6,28 @@ import {
   Strong,
   Title,
 } from "./styles";
-import { restauranteByDominioQuery } from "../../services/api/restaurantes";
 import { CardLogin } from "../../components/CardLogin";
-import { useEffect, useState } from "react";
+import { useRestaurante } from "../../hooks/useRestaurante";
 
-interface LoginProps {
-
-}
+interface LoginProps {}
 
 export const Login: React.FC<LoginProps> = () => {
-    const [restaurante, setRestaurante] = useState<any | null>(null);
-    const [searchParams] = useSearchParams();
+  const { restaurante } = useRestaurante();
 
-    useEffect(() => {
-      const fetchRestaurante = async () => {
-        const dominio = searchParams.get("restaurante");
-        try {
-            const restaurante = await restauranteByDominioQuery.params(dominio ?? "").fetch();
-            setRestaurante(restaurante);
-        } catch (error) {
-          console.error("Erro ao buscar restaurante:", error);
-          setRestaurante(null);
-        }
-      };
-
-      fetchRestaurante();
-    }, [searchParams]);
-
-    return (
-        <Container>
-            <Overlay>
-                <BoxTitle>
-                    <Title>
-                        Bem vindo ao <Strong>RestoWeb</Strong>
-                    </Title>
-                    <Description style={{ textAlign: "left"}}>
-                        Oferecemos uma ferramenta poderosa para administrar seu
-                        estabelecimento com excelência e eficiência.
-                    </Description>
-                </BoxTitle>
-                {restaurante && (
-                    <CardLogin restaurante={restaurante} />
-                )}
-            </Overlay>
-        </Container>
-    );
+  return (
+    <Container>
+      <Overlay>
+        <BoxTitle>
+          <Title>
+            Bem vindo ao <Strong>RestoWeb</Strong>
+          </Title>
+          <Description style={{ textAlign: "left" }}>
+            Oferecemos uma ferramenta poderosa para administrar seu
+            estabelecimento com excelência e eficiência.
+          </Description>
+        </BoxTitle>
+        <CardLogin restaurante={restaurante} />
+      </Overlay>
+    </Container>
+  );
 };

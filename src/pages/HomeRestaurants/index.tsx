@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import {
   BoxTitle,
   Container,
@@ -10,8 +9,6 @@ import {
 import { CarouselList } from "../../components/CarouselList";
 
 export const HomeRestaurants = () => {
-  const navigate = useNavigate();
-
   return (
     <Container>
       <Overlay>
