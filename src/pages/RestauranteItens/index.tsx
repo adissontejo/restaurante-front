@@ -51,8 +51,8 @@ export const RestauranteItens = ({ admin }: RestauranteItensProps) => {
     <>
       <TitleWithUnderline
         text="Menu"
-        buttonText="Criar item"
-        buttonAction={() => setCreateOpen(true)}
+        buttonText={(admin && "Criar item") || undefined}
+        buttonAction={(admin && (() => setCreateOpen(true))) || undefined}
       />
       <ListTab
         value={searchParams.get("categoria")}
