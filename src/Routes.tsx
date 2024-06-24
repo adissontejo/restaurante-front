@@ -12,6 +12,7 @@ import { RestaurantePedidos } from "./pages/RestaurantePedidos";
 import { HomeRestaurants } from "./pages/HomeRestaurants";
 import { RestauranteAdminHome } from "./pages/RestauranteAdminHome";
 import { EditRestaurante } from "./pages/EditRestaurante";
+import { RestauranteFuncionarios } from "./pages/RestauranteFuncionario";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
               {
                 path: "conta",
                 element: <RestauranteContaCliente />,
+              },
+              {
+                path: "funcionarios",
+                element: <RestauranteFuncionarios />,
               },
             ],
           },

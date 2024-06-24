@@ -7,6 +7,7 @@ import {
   FieldValues,
 } from "react-hook-form";
 import InputMask from "react-input-mask";
+import { MenuItem } from "@mui/material";
 
 export interface FormProps extends GridProps {}
 
@@ -40,6 +41,7 @@ export interface ControlledFormFieldProps<
 > extends FormFieldProps {
   control: ControllerProps<TFieldValues, TName>["control"];
   name: TName;
+  options?: { label: string; value: any }[]; // Adicionando a propriedade options
 }
 
 export const ControlledFormField = <
@@ -48,6 +50,8 @@ export const ControlledFormField = <
 >({
   control,
   name,
+  options,
+  select,
   ...rest
 }: ControlledFormFieldProps<TFieldValues, TName>) => {
   return (
@@ -58,9 +62,17 @@ export const ControlledFormField = <
         <FormField
           {...rest}
           {...field}
+          select={select}
           error={!!fieldState.error}
           helperText={fieldState.error?.message}
-        />
+        >
+          {select &&
+            options?.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+        </FormField>
       )}
     />
   );

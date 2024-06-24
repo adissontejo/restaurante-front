@@ -8,6 +8,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Dialog,
 } from "@mui/material";
 import { BoxContent, BoxHeader } from "./styles";
 import { theme } from "../../../styles/theme";
@@ -17,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getCupomsQuery } from "../../../services/api/cupons";
 import { useAuth } from "../../../hooks/useAuth";
+import { DialogMesa } from "../DialogMesa";
 
 interface PaymentCardProps {}
 
@@ -36,6 +38,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
 
   const [selectedCoupon, setSelectedCoupon] = useState<number>();
   const [appliedCoupon, setAppliedCoupon] = useState<number>();
+  const [dialogMesa, setDialogMesa] = useState(false);
 
   const discount = useMemo(() => {
     if (appliedCoupon) {
@@ -43,15 +46,10 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
     }
   }, [appliedCoupon]);
 
-  const handleConfirm = async () => {
-    if (!itensCarrinho.length) {
-      return;
-    }
-
+  const handleConfirm = async (numeroMesa: number) => {
     try {
       await createPedido({
-        numeroMesa: 40,
-        funcionarioId: 2,
+        numeroMesa,
         restauranteId: restaurante.id,
         itens: itensCarrinho.map((item) => ({
           instanciaItemId: item.instanciaAtiva.id,
@@ -73,6 +71,12 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
 
   return (
     <Card sx={{ maxWidth: 345, borderRadius: "24px", boxShadow: 3 }}>
+      <Dialog open={dialogMesa}>
+        <DialogMesa
+          handleClose={() => setDialogMesa(false)}
+          onSubmit={handleConfirm}
+        />
+      </Dialog>
       <BoxHeader>
         <Typography
           variant="h6"
@@ -186,7 +190,9 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
           variant="contained"
           color="primary"
           fullWidth
-          onClick={handleConfirm}
+          onClick={
+            (itensCarrinho.length && (() => setDialogMesa(true))) || undefined
+          }
           sx={{ marginBottom: 2 }}
           style={{ background: theme.colors.black[600] }}
         >
