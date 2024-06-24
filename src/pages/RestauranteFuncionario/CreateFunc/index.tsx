@@ -66,10 +66,10 @@ export const DialogCreateFuncionario: React.FC<DialogCreateFuncionarioProps> = (
           required
           fullWidth
           sx={{ marginY: 1 }}
-          /*options={Object.values(Cargo).map((option) => ({
-            label: option,
+          options={Object.values(Cargo).map((option) => ({
+            label: option.charAt(0) + option.slice(1).toLowerCase(),
             value: option,
-          }))*/
+          }))}
         />
         <ControlledFormField
           control={control}
