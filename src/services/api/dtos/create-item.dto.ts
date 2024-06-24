@@ -4,7 +4,8 @@ export interface CreateItemDTO {
   nome: string;
   preco: number;
   habilitado?: boolean;
-  categoriaId: number;
+  restauranteId: number;
+  categoria: string;
   campos?: CreateCampoFormularioDTO[];
   foto?: File;
 }

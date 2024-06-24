@@ -2,12 +2,16 @@ import { z } from "zod";
 
 export const schema = z.object({
   nome: z
-    .string({ required_error: "Nome muito curto!" })
+    .string({ required_error: "Preencha o nome!" })
     .min(3, "Nome muito curto!")
     .max(100, "Nome muito longo!"),
   preco: z.coerce
     .number({ invalid_type_error: "Preço inválido!" })
     .positive("Preço inválido!"),
+  categoria: z
+    .string({ required_error: "Preencha a categoria!" })
+    .min(3, "Categoria muito curta!")
+    .max(100, "Categoria muito longa!"),
   foto: z.any(),
   habilitado: z.any(),
   campos: z.array(

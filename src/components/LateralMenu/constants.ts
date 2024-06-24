@@ -21,7 +21,7 @@ export const itemsMenu = [
   },
   {
     icon: CalculatorBill,
-    path: "historico",
+    path: "pedidos",
   },
   {
     icon: UserManager,
@@ -45,5 +45,9 @@ export const itemsMenuAdmin = [
   {
     icon: Visit,
     path: "dados",
+  },
+  {
+    icon: UserManager,
+    path: "conta",
   },
 ] as const;

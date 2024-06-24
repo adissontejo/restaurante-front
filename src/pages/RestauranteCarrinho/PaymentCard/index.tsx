@@ -48,23 +48,27 @@ export const PaymentCard: React.FC<PaymentCardProps> = () => {
       return;
     }
 
-    await createPedido({
-      numeroMesa: 40,
-      funcionarioId: 2,
-      restauranteId: restaurante.id,
-      itens: itensCarrinho.map((item) => ({
-        instanciaItemId: item.instanciaAtiva.id,
-        observacao: item.observacao,
-        quantidade: item.quantidade,
-        respostas: item.respostas,
-      })),
-      cupomId: selectedCoupon,
-    });
-    toast.success("Pedido criado com sucesso!");
+    try {
+      await createPedido({
+        numeroMesa: 40,
+        funcionarioId: 2,
+        restauranteId: restaurante.id,
+        itens: itensCarrinho.map((item) => ({
+          instanciaItemId: item.instanciaAtiva.id,
+          observacao: item.observacao,
+          quantidade: item.quantidade,
+          respostas: item.respostas,
+        })),
+        cupomId: selectedCoupon,
+      });
+      toast.success("Pedido criado com sucesso!");
 
-    emptyCart();
+      emptyCart();
 
-    navigate(`/restaurante/${dominio}/historico/pedidos`);
+      navigate(`/restaurante/${dominio}/pedidos`);
+    } catch (error) {
+      toast.error("Informações do pedido desatualizadas. Recarregue a página.");
+    }
   };
 
   return (

@@ -1,11 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Dialog, Grid } from "@mui/material";
 import { CardItem } from "./CardItem";
 import { TitleWithUnderline } from "../../components/TitleWithUnderline";
 import { ListTab } from "../../components/ListTab";
 import { useRestaurante } from "../../hooks/useRestaurante";
-import { categoriasQuery } from "../../services/api/categorias";
 import { DialogItemForm } from "./DialogItemForm";
+import { getItensQuery } from "../../services/api/itens";
+import { getCategorias } from "../../utils";
+import { useSearchParams } from "react-router-dom";
 
 export interface RestauranteItensProps {
   admin?: boolean;
@@ -16,22 +18,34 @@ export const RestauranteItens = ({ admin }: RestauranteItensProps) => {
 
   const [createOpen, setCreateOpen] = useState(false);
 
-  const { data: categorias } = categoriasQuery.params(restaurante.id).use();
+  const { data: itens } = getItensQuery.params(restaurante.id).use();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const categoria = searchParams.get("categoria");
+
+  const categorias = useMemo(() => {
+    return getCategorias(itens || []);
+  }, [itens]);
+
+  useEffect(() => {
+    if (!categorias.includes(categoria || "")) {
+      setSearchParams({ categoria: categorias[0] });
+    }
+  }, [categorias]);
 
   const listTabItems = useMemo(() => {
-    return categorias?.map((item, index) => ({
-      label: item.nome,
-      value: index,
+    return categorias.map((categoria) => ({
+      label: categoria,
+      value: categoria,
     }));
   }, [categorias]);
 
-  const [activeCategory, setActiveCategory] = useState(0);
-
-  const items = useMemo(() => {
-    return categorias?.[activeCategory]?.itens.filter(
-      (item) => item.habilitado || admin
+  const filteredItens = useMemo(() => {
+    return itens?.filter(
+      (item) => item.categoria === categoria && (item.habilitado || admin)
     );
-  }, [activeCategory, categorias, admin]);
+  }, [itens, categoria, admin]);
 
   return (
     <>
@@ -41,26 +55,19 @@ export const RestauranteItens = ({ admin }: RestauranteItensProps) => {
         buttonAction={() => categorias?.length && setCreateOpen(true)}
       />
       <ListTab
-        value={activeCategory}
+        value={searchParams.get("categoria")}
         items={listTabItems}
-        onChange={setActiveCategory}
+        onChange={(value) => setSearchParams({ categoria: value })}
       />
       <Grid container spacing={12}>
-        {items?.map((item, index) => (
+        {filteredItens?.map((item, index) => (
           <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={index}>
-            <CardItem
-              item={item}
-              admin={admin}
-              categoriaId={categorias?.[activeCategory]?.id || 0}
-            />
+            <CardItem item={item} admin={admin} />
           </Grid>
         ))}
       </Grid>
       <Dialog open={createOpen}>
-        <DialogItemForm
-          handleClose={() => setCreateOpen(false)}
-          categoriaId={categorias?.[activeCategory]?.id || 0}
-        />
+        <DialogItemForm handleClose={() => setCreateOpen(false)} />
       </Dialog>
     </>
   );

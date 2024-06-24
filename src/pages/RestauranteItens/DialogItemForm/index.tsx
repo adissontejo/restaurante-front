@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Autocomplete,
   Button,
@@ -28,16 +28,18 @@ import { InputCard } from "../../../components/InputCard";
 import { Delete } from "@mui/icons-material";
 import {
   createItemMutation,
+  getItensQuery,
   updateItemMutation,
 } from "../../../services/api/itens";
 import { TipoCampo } from "../../../services/api/dtos/create-campo-formulario.dto";
 import { toast } from "react-toastify";
 import { ControlledBooleanRadio } from "../../../components/BooleanRadio";
+import { useRestaurante } from "../../../hooks/useRestaurante";
+import { getCategorias } from "../../../utils";
 
 interface DialogItemFormProps {
   item?: ItemResponseDTO;
   handleClose: () => void;
-  categoriaId: number;
 }
 
 interface FormData {
@@ -45,6 +47,7 @@ interface FormData {
   preco: number;
   habilitado: "yes" | "no";
   foto: File;
+  categoria: string;
   campos: {
     obrigatorio: "yes" | "no";
     nome: string;
@@ -57,13 +60,17 @@ interface FormData {
 
 export const DialogItemForm: React.FC<DialogItemFormProps> = ({
   item,
-  categoriaId,
   handleClose,
 }) => {
+  const { restaurante } = useRestaurante();
+
+  const { data: itens } = getItensQuery.params(restaurante.id).use();
+
   const { control, handleSubmit, watch } = useForm<FormData>({
     defaultValues: {
       nome: item?.nome,
       preco: item?.instanciaAtiva.preco,
+      categoria: item?.categoria,
       habilitado: item ? (item.habilitado ? "yes" : "no") : "yes",
       campos: item?.campos.map((campo) => ({
         ...campo,
@@ -84,10 +91,15 @@ export const DialogItemForm: React.FC<DialogItemFormProps> = ({
   const updateItem = updateItemMutation.use();
   const campos = watch("campos");
 
+  const categorias = useMemo(() => {
+    return getCategorias(itens || []);
+  }, [itens]);
+
   const handleAdd = (formData: FormData) => {
     const data = {
       ...formData,
-      categoriaId,
+      categoria: formData.categoria,
+      restauranteId: restaurante.id,
       habilitado: formData.habilitado === "yes",
       campos: formData.campos?.length
         ? formData.campos.map((campo) => {
@@ -169,6 +181,29 @@ export const DialogItemForm: React.FC<DialogItemFormProps> = ({
               control={control}
               name="foto"
               placeholderUrl={item?.fotoUrl || undefined}
+            />
+          </GridItem>
+          <GridItem>
+            <Controller
+              control={control}
+              name="categoria"
+              render={({ field, fieldState }) => (
+                <Autocomplete
+                  fullWidth
+                  freeSolo
+                  options={categorias}
+                  renderInput={(params) => (
+                    <TextField
+                      label="Categoria"
+                      {...params}
+                      {...field}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      required
+                    />
+                  )}
+                ></Autocomplete>
+              )}
             />
           </GridItem>
           <ControlledFormField

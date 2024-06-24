@@ -11,7 +11,6 @@ import {
 import { BoxImage, BoxTitle, ButtonsWrapper } from "./styles";
 import CrossSmall from "../../../assets/cross-small.svg?react";
 import { theme } from "../../../styles/theme";
-import { CategoriaResponseDTO } from "../../../services/api/dtos/categoria-response.dto";
 import { Controller, useForm } from "react-hook-form";
 import { ControlledFormField } from "../../../components/Form";
 import { useRestaurante } from "../../../hooks/useRestaurante";
@@ -20,9 +19,10 @@ import { schema } from "./constants";
 import { toast } from "react-toastify";
 import { TipoCampo } from "../../../services/api/dtos/create-campo-formulario.dto";
 import { CampoFormularioResponseDTO } from "../../../services/api/dtos/campo-formluario-response.dto";
+import { ItemResponseDTO } from "../../../services/api/dtos/item-response.dto";
 
 interface DialogAddItemProps {
-  item: CategoriaResponseDTO["itens"][number];
+  item: ItemResponseDTO;
   handleClose: () => void;
 }
 

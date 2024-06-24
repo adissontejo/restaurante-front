@@ -19,20 +19,15 @@ import Plus from "../../../assets/plus.svg?react";
 import Pencil from "../../../assets/pencil.svg?react";
 import { DialogAddItem } from "../DialogAddItem";
 import { theme } from "../../../styles/theme";
-import { CategoriaResponseDTO } from "../../../services/api/dtos/categoria-response.dto";
 import { DialogItemForm } from "../DialogItemForm";
+import { ItemResponseDTO } from "../../../services/api/dtos/item-response.dto";
 
 interface CardItemProps {
-  item: CategoriaResponseDTO["itens"][number];
-  categoriaId: number;
+  item: ItemResponseDTO;
   admin?: boolean;
 }
 
-export const CardItem: React.FC<CardItemProps> = ({
-  item,
-  admin,
-  categoriaId,
-}) => {
+export const CardItem: React.FC<CardItemProps> = ({ item, admin }) => {
   const [hovered, setHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -101,11 +96,7 @@ export const CardItem: React.FC<CardItemProps> = ({
         <DialogAddItem item={item} handleClose={handleToogleModal} />
       </Dialog>
       <Dialog open={editOpen}>
-        <DialogItemForm
-          item={item}
-          handleClose={() => setEditOpen(false)}
-          categoriaId={categoriaId}
-        />
+        <DialogItemForm item={item} handleClose={() => setEditOpen(false)} />
       </Dialog>
     </>
   );

@@ -5,10 +5,12 @@ import { CreateItemDTO } from "./dtos/create-item.dto";
 import { ItemResponseDTO } from "./dtos/item-response.dto";
 import { UpdateItemDTO } from "./dtos/update-item.dto";
 
-export const getItemQuery = createQuery((id: number) => ({
-  queryKey: ["item", id],
+export const getItensQuery = createQuery((restauranteId: number) => ({
+  queryKey: ["itens"],
   queryFn: () =>
-    api.get<ItemResponseDTO>(`/itens/${id}`).then((response) => response.data),
+    api
+      .get<ItemResponseDTO[]>(`/itens`, { params: { restauranteId } })
+      .then((response) => response.data),
 }));
 
 export const createItemMutation = createMutation({
@@ -21,7 +23,7 @@ export const createItemMutation = createMutation({
       .post<ItemResponseDTO>("/itens", data)
       .then((response) => response.data)
       .then((data) => {
-        queryClient.invalidateQueries({ queryKey: ["categorias"] });
+        queryClient.invalidateQueries({ queryKey: ["itens"] });
 
         return data;
       });
@@ -39,7 +41,7 @@ export const updateItemMutation = createMutation({
       .put<ItemResponseDTO>(`/itens/${id}`, data)
       .then((response) => response.data)
       .then((data) => {
-        queryClient.invalidateQueries({ queryKey: ["categorias"] });
+        queryClient.invalidateQueries({ queryKey: ["itens"] });
 
         return data;
       });

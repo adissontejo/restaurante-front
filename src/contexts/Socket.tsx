@@ -18,7 +18,7 @@ export interface SocketContextData {
   setFuncionarioResponsavel: (
     pedidoId: number,
     funcionarioResponsavelId: number
-  ) => Promise<void>;
+  ) => Promise<FuncionarioResponseDTO>;
   pedidos: PedidoResponseDTO[];
 }
 
@@ -36,6 +36,26 @@ export const SocketProvider = ({
 
   const [pedidos, setPedidos] = useState<PedidoResponseDTO[]>([]);
   const [socket, setSocket] = useState<Socket>();
+
+  const emitAsync = <T extends any[]>(event: string, ...params: any[]) => {
+    return new Promise<T>((resolve, reject) => {
+      const responseListener = (...data: T) => {
+        socket?.off(`${event}_error`, errorListener);
+
+        resolve(data);
+      };
+
+      const errorListener = (...data: T) => {
+        socket?.off(`${event}_response`, responseListener);
+
+        reject(data);
+      };
+
+      socket?.once(`${event}_response`, responseListener);
+      socket?.once(`${event}_error`, errorListener);
+      socket?.emit(event, ...params);
+    });
+  };
 
   useEffect(() => {
     setSocket(
@@ -94,75 +114,57 @@ export const SocketProvider = ({
     );
   };
 
-  const createPedido = (pedido: CreatePedidoDTO) => {
-    return new Promise<PedidoResponseDTO>((resolve) => {
-      const unloggedIds: number[] = JSON.parse(
-        localStorage.getItem("unloggedIds") || "[]"
-      );
+  const createPedido = async (pedido: CreatePedidoDTO) => {
+    const unloggedIds: number[] = JSON.parse(
+      localStorage.getItem("unloggedIds") || "[]"
+    );
 
-      socket?.emit("create", pedido);
+    const [response] = await emitAsync<[PedidoResponseDTO]>("create", pedido);
 
-      socket?.once("create_response", (data: PedidoResponseDTO) => {
-        pedidoCreated(data);
-        getCupomsQuery.params(usuario?.id || 0, restaurante.id).invalidate();
-        resolve(data);
-        if (!usuario) {
-          unloggedIds.push(data.id);
-        }
-        localStorage.setItem("unloggedIds", JSON.stringify(unloggedIds));
-      });
-    });
+    getCupomsQuery.params(usuario?.id || 0, restaurante.id).invalidate();
+
+    if (!usuario) {
+      unloggedIds.push(response.id);
+
+      localStorage.setItem("unloggedIds", JSON.stringify(unloggedIds));
+    }
+
+    pedidoCreated(response);
+
+    return response;
   };
 
-  const startPedido = (id: number) => {
-    return new Promise<void>((resolve) => {
-      socket?.emit("start", id);
+  const startPedido = async (id: number) => {
+    await emitAsync("start", id);
 
-      socket?.once("start_response", () => {
-        pedidoStarted(id);
-        resolve();
-      });
-    });
+    pedidoStarted(id);
   };
 
-  const cancelItem = (id: number) => {
-    return new Promise<void>((resolve) => {
-      socket?.emit("cancel-item", id);
+  const cancelItem = async (id: number) => {
+    await emitAsync("cancel-item", id);
 
-      socket?.once("cancel-item_response", () => {
-        itemCanceled(id);
-        resolve();
-      });
-    });
+    itemCanceled(id);
   };
 
-  const finishItem = (id: number) => {
-    return new Promise<void>((resolve) => {
-      socket?.emit("finish-item", id);
+  const finishItem = async (id: number) => {
+    await emitAsync("finish-item", id);
 
-      socket?.once("finish-item_response", () => {
-        itemFinished(id);
-        resolve();
-      });
-    });
+    itemFinished(id);
   };
 
-  const setFuncionarioResponsavel = (
+  const setFuncionarioResponsavel = async (
     pedidoId: number,
     funcionarioResponsavelId: number
   ) => {
-    return new Promise<void>((resolve) => {
-      socket?.emit(
-        "set-funcionario-responsavel",
-        pedidoId,
-        funcionarioResponsavelId
-      );
+    const [data] = await emitAsync<[FuncionarioResponseDTO]>(
+      "set-funcionario-responsavel",
+      pedidoId,
+      funcionarioResponsavelId
+    );
 
-      socket?.once("set-funcionario-responsavel_response", (data) => {
-        funcionarioResponsavelChanged(pedidoId, data);
-        resolve();
-      });
-    });
+    funcionarioResponsavelChanged(pedidoId, data);
+
+    return data;
   };
 
   useEffect(() => {
