@@ -18,7 +18,7 @@ export const RestauranteAdminHome = () => {
 
   const summary = useMemo(() => {
     return {
-      ativos: pedidos.filter((item) => !item.iniciado).length,
+      ativos: pedidos.filter((pedido) => !pedido.iniciado).length,
       preparando: pedidos.filter(
         (pedido) =>
           pedido.iniciado &&
